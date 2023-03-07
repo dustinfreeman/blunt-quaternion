@@ -1,6 +1,7 @@
 {
   "name": "blunt-quaternion",
-  "version": "0.1.0",
+  "version": "0.0.1",
+  "homepage": ".",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.14.1",
@@ -10,15 +11,21 @@
     "@types/node": "^16.7.13",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
+    "@types/styled-components": "^5.1.26",
+    "babel-plugin-styled-components": "^2.0.7",
+    "eslint-config-prettier": "^8.7.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.8.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
+    "styled-components": "^5.3.8",
     "typescript": "^4.4.2",
     "web-vitals": "^2.1.0"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build; rm build.zip; zip -r build build;",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
