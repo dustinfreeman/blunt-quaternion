@@ -1,4 +1,4 @@
-import { Choice } from '../choices';
+import { Choice } from '../choices/ui';
 import { Meter } from '../utils';
 
 // https://nethackwiki.com/wiki/Role

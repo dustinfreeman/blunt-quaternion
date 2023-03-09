@@ -64,15 +64,8 @@ function App() {
         );
       }
     }
-
-    // console.log('canvas draw one time', canvas.width, canvas.height);
   });
 
-  //HACK: ugly requirement of react hooks is that if we update game,
-  // using setGame, React will only re-render if there's been a top-level change.
-  // it does not check for deep changes (such as a character's HP changing)
-  // the workaround for this is to always use the spread operator,
-  // ie. setGame{...game}, which seems to force an update.
   const [game, setGame] = useState<Game.GameState>(Game.Empty());
   const [charInfo, setCharInfo] = useState<JSX.Element>(<span></span>);
   const [choiceList, setChoiceList] = useState<Choices.Choice[]>([]);
@@ -92,12 +85,12 @@ function App() {
     }
   }, [game]);
 
+  //rotation animation
   const rotateRate = 0.1;
   useEffect(() => {
     const interval = setInterval(() => {
       const phase = game.quaternionIndex % 1;
       if (phase !== 0) {
-        // console.log('phase', phase);
         if (phase < rotateRate || 1 - phase < rotateRate) {
           //snap
           setGame({
@@ -105,7 +98,6 @@ function App() {
             quaternionIndex:
               Math.round(game.quaternionIndex) % game.party.length
           });
-          // refreshChoices();
         } else {
           //keep rotating
           setGame({
@@ -120,7 +112,6 @@ function App() {
 
   const StartGame = useCallback(() => {
     setGame(Game.Begin());
-    // refreshChoices();
   }, [game, setGame]);
 
   const StartScreen: JSX.Element = (
@@ -142,109 +133,7 @@ function App() {
       setChoiceList([]);
       return;
     }
-    const _choiceList: Choices.Choice[] = [
-      {
-        buttonText: 'Think Deeply...',
-        made: (game) => {
-          return {
-            gameState: game,
-            bluntConsumed: 0.7,
-            //TODO: Excercise WIS
-            choiceResultMessage: 'I am a ' + char.species
-          };
-        }
-      }
-      // {
-      //   buttonText: 'YASD',
-      //   made: (game) => {
-      //     const deadParty = game.party;
-      //     deadParty.forEach((c) => (c.hp.current = 0));
-      //     return { gameState: { ...game, party: deadParty }, bluntConsumed: 0 };
-      //   }
-      // },
-      // {
-      //   buttonText: 'Just gonna off myself',
-      //   made: (game) => {
-      //     char.hp.current = 0;
-      //     return {
-      //       gameState: game,
-      //       bluntConsumed: 0.05,
-      //       choiceResultMessage: 'Byeee'
-      //     };
-      //   }
-      // },
-      // {
-      //   buttonText: 'Heal me please',
-      //   made: (game) => {
-      //     char.hp.current = char.hp.max;
-      //     return { gameState: game, bluntConsumed: 0.1 };
-      //   }
-      // },
-      // {
-      //   buttonText: 'I am just chilling, man',
-      //   made: (game) => {
-      //     return { gameState: game, bluntConsumed: 0.05 };
-      //   }
-      // }
-    ];
-    if (char.relationship === 'Party Member') {
-      if (game.inventory.length > 0) {
-        const randomToEat = randomChoices(game.inventory, 1)[0];
-        if (randomToEat.onEat !== undefined) {
-          _choiceList.push({
-            buttonText: "I'm going to eat this " + randomToEat.name,
-            made: (game) => {
-              randomToEat.onEat?.(char);
-              return {
-                gameState: {
-                  ...game,
-                  inventory: game.inventory.filter(
-                    (item) => item !== randomToEat
-                  )
-                },
-                bluntConsumed: 0.1,
-                choiceResultMessage: 'yum!'
-              };
-            }
-          });
-        }
-      }
-      if (char.tactics.aggression < 1) {
-        _choiceList.push({
-          buttonText: 'I should be more aggressive.',
-          made: (game) => {
-            char.tactics.aggression = ROT.Util.clamp(
-              char.tactics.aggression + 0.25,
-              0,
-              1
-            );
-            return {
-              gameState: game,
-              bluntConsumed: 0.1,
-              choiceResultMessage: 'grrr!'
-            };
-          }
-        });
-      }
-      if (char.tactics.aggression > 0) {
-        _choiceList.push({
-          buttonText: 'I should be less aggressive.',
-          made: (game) => {
-            char.tactics.aggression = ROT.Util.clamp(
-              char.tactics.aggression - 0.25,
-              0,
-              1
-            );
-            return {
-              gameState: game,
-              bluntConsumed: 0.3,
-              choiceResultMessage: 'I will try to get into less confrontations.'
-            };
-          }
-        });
-      }
-    }
-    _choiceList.push(...char.extraChoices);
+    const _choiceList: Choices.Choice[] = Choices.ChoicesFor(char, game);
 
     //filter choices for relevance
     filterInPlace(

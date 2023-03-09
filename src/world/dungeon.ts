@@ -1,6 +1,6 @@
 import * as ROT from 'rot-js';
 import { Item } from '.';
-import { Choice } from '../choices';
+import { Choice } from '../choices/ui';
 import { FormCharacter } from './characters';
 
 interface DungeonLevel {
