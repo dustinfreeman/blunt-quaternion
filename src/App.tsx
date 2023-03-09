@@ -231,12 +231,6 @@ function App() {
           World.MazesOfMenace[nextDungeonLevel].characters ?? []
         )
       ];
-      console.log(
-        'locals!',
-        nextDungeonLevel,
-        locals,
-        World.MazesOfMenace[nextDungeonLevel]
-      );
       //definitely add guides
       //TODO: generalize "move from one array to another with a filter"
       party.push(...locals.filter((p) => p.relationship === 'Local Guide'));
