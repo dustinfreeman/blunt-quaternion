@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import styled from 'styled-components';
 import * as ROT from 'rot-js';
 import * as UI from './ui';
 import * as ResponsiveApp from './ResponsiveApp';
@@ -11,16 +10,9 @@ import { filterInPlace, randomChoices } from './utils';
 
 const debug = false;
 
-const Title = styled.h3({ top: '20%', color: '#66bb66' });
-const DungeonLevelTitle = styled.div({
-  top: '10%',
-  color: '#bbb',
-  fontFamily: 'monospace'
-});
-
-const cMin = 5;
-const cMax = 120;
 const cValRand = () => {
+  const cMin = 5;
+  const cMax = 120;
   return ROT.RNG.getUniformInt(cMin, cMax);
 };
 
@@ -133,7 +125,7 @@ function App() {
 
   const StartScreen: JSX.Element = (
     <ResponsiveApp.Overlay>
-      <Title>Blunt Quaternion</Title>
+      <UI.Title>Blunt Quaternion</UI.Title>
       <UI.DelveButton onClick={StartGame}>Begin...</UI.DelveButton>
     </ResponsiveApp.Overlay>
   );
@@ -385,10 +377,10 @@ function App() {
 
   const BQScreen: JSX.Element = (
     <ResponsiveApp.Overlay>
-      <DungeonLevelTitle>
+      <UI.DungeonLevelTitle>
         Dungeon Level: {game.currentDungeonLevel} <br />
         {World.MazesOfMenace.at(game.currentDungeonLevel)?.name}
-      </DungeonLevelTitle>
+      </UI.DungeonLevelTitle>
       {game.bluntFraction > 0 && (
         <span>
           <UI.Blunt bluntFraction={game.bluntFraction}>
@@ -424,17 +416,17 @@ function App() {
   );
 
   const DelvingScreen: JSX.Element = (
-    <DungeonLevelTitle>Delving...</DungeonLevelTitle>
+    <UI.DungeonLevelTitle>Delving...</UI.DungeonLevelTitle>
   );
 
   const WinScreen: JSX.Element = (
     <ResponsiveApp.Overlay style={{ backgroundColor: 'darkslategray' }}>
-      <DungeonLevelTitle>
+      <UI.DungeonLevelTitle>
         Your party has returned to the surface, <br />
         with the Amulet of Yendor in your possession.
         <br />
         You have ascended and won!
-      </DungeonLevelTitle>
+      </UI.DungeonLevelTitle>
       <UI.DelveButton
         onClick={() => {
           restartGame();
@@ -446,7 +438,7 @@ function App() {
 
   const LossScreen: JSX.Element = (
     <ResponsiveApp.Overlay style={{ backgroundColor: 'black' }}>
-      <DungeonLevelTitle>Your entire party has died.</DungeonLevelTitle>
+      <UI.DungeonLevelTitle>Your entire party has died.</UI.DungeonLevelTitle>
       <UI.DelveButton
         onClick={() => {
           restartGame();
@@ -492,7 +484,7 @@ function App() {
         )}
         {showHelp && (
           <ResponsiveApp.Overlay style={{ backgroundColor: 'darkslateblue' }}>
-            <Title>Help?</Title>
+            <UI.Title>Help?</UI.Title>
             <UI._BaseButton
               onClick={() => {
                 setShowHelp(false);

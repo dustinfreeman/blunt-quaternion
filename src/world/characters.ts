@@ -1,5 +1,5 @@
-import * as ROT from 'rot-js';
 import { Choice } from '../choices';
+import { Meter } from '../utils';
 
 // https://nethackwiki.com/wiki/Role
 // https://nethackwiki.com/wiki/Role_difficulty#Role_difficulty_statistics
@@ -13,18 +13,6 @@ export const Pets = ['dog', 'cat', 'pony'];
 export const Monsters = ['owlbear'];
 const SpeciesList = [undefined, ...PlayerSpeciesList, ...Pets, ...Monsters];
 export type Species = (typeof SpeciesList)[number];
-
-export class Meter {
-  current: number;
-  max: number;
-  constructor(max: number, current?: number) {
-    this.max = max;
-    this.current = current ?? this.max;
-  }
-  update(delta: number) {
-    this.current = ROT.Util.clamp(this.current + delta, 0, this.max);
-  }
-}
 
 interface Attributes {
   // https://nethackwiki.com/wiki/Attribute
@@ -59,6 +47,30 @@ export interface FormCharacter extends Partial<Character> {
   level: number;
 }
 
+export function Display(c: Character): { char: string } {
+  if (c.name === 'You') {
+    return { char: '@' };
+  }
+
+  const SpeciesCharMap = new Map<Species, string>([
+    ['dog', 'd'],
+    ['cat', 'f'],
+    ['pony', 'u'],
+    ['dwarf', 'h'],
+    ['human', '@'],
+    ['elf', '@'],
+    ['gnome', 'G'],
+    ['orc', 'o'],
+    ['owlbear', 'Y']
+  ]);
+  const char = SpeciesCharMap.get(c.species);
+  if (char) {
+    return { char: char };
+  }
+
+  return { char: '?' };
+}
+
 export function FleshOut(chars: FormCharacter[]): Character[] {
   return chars.map((c) => {
     //EXTRA CHOICES
@@ -81,14 +93,6 @@ export function FleshOut(chars: FormCharacter[]): Character[] {
           const choiceMessage =
             barkable +
             (excerciseAttrUp ? ' (and their strength increased!)' : '');
-          console.log(
-            char.attributes.STR,
-            Math.floor(char.attributes.STR),
-            newSTR,
-            Math.floor(newSTR),
-            excerciseAttrUp,
-            choiceMessage
-          );
           char.attributes.STR = newSTR;
           return {
             gameState: game,
@@ -122,30 +126,6 @@ export function FleshOut(chars: FormCharacter[]): Character[] {
       ...c
     };
   });
-}
-
-export function Display(c: Character): { char: string } {
-  if (c.name === 'You') {
-    return { char: '@' };
-  }
-
-  const SpeciesCharMap = new Map<Species, string>([
-    ['dog', 'd'],
-    ['cat', 'f'],
-    ['pony', 'u'],
-    ['dwarf', 'h'],
-    ['human', '@'],
-    ['elf', '@'],
-    ['gnome', 'G'],
-    ['orc', 'o'],
-    ['owlbear', 'Y']
-  ]);
-  const char = SpeciesCharMap.get(c.species);
-  if (char) {
-    return { char: char };
-  }
-
-  return { char: '?' };
 }
 
 export const xpPerLevel = [
