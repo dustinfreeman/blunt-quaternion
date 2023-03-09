@@ -1,3 +1,5 @@
+import * as ROT from 'rot-js';
+
 export function filterInPlace<T>(a: T[], condition: (val: T) => boolean) {
   let i = 0,
     j = 0;
@@ -27,4 +29,16 @@ export function randomChoices<T>(arr: readonly T[], quantity: number): T[] {
     }
   }
   return returnArr;
+}
+
+export class Meter {
+  current: number;
+  max: number;
+  constructor(max: number, current?: number) {
+    this.max = max;
+    this.current = current ?? this.max;
+  }
+  update(delta: number) {
+    this.current = ROT.Util.clamp(this.current + delta, 0, this.max);
+  }
 }

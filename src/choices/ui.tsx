@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import * as UI from './ui';
-import * as ResponsiveApp from './ResponsiveApp';
-import { GameState } from './game';
-import * as World from './world';
+import * as UI from '../ui';
+import * as ResponsiveApp from '../ResponsiveApp';
+import { GameState } from '../game';
+import * as World from '../world';
 
 export interface ChoiceResult {
   gameState: GameState;

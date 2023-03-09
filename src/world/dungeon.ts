@@ -1,6 +1,6 @@
 import * as ROT from 'rot-js';
 import { Item } from '.';
-import { Choice } from '../choices';
+import { Choice } from '../choices/ui';
 import { FormCharacter } from './characters';
 
 interface DungeonLevel {
@@ -44,7 +44,37 @@ export const MazesOfMenace: DungeonLevel[] = [
   },
   { name: 'Mine Town' },
   { name: 'Gnomish Mines' },
-  { name: 'Oracle' }, // https://nethackwiki.com/wiki/The_Oracle#Level
+
+  {
+    // https://nethackwiki.com/wiki/The_Oracle#Level
+    name: 'Oracle',
+    characters: [
+      //https://nethackwiki.com/wiki/The_Oracle#Monster
+      {
+        name: 'The Oracle',
+        species: 'human',
+        relationship: 'Local Guide',
+        level: 12,
+        extraChoices: [
+          {
+            buttonText: 'Allow me to provide you a consultation',
+            made: (game) => {
+              return {
+                gameState: game,
+                bluntConsumed: 0.2,
+                // https://nethackwiki.com/wiki/Source:NetHack_3.6.1/dat/oracles.txt
+                choiceResultMessage:
+                  ROT.RNG.getItem([
+                    'Behold the cockatrice...',
+                    'Though the shopkeepers be wary, thieves...'
+                  ]) ?? ''
+              };
+            }
+          }
+        ]
+      }
+    ]
+  },
   { name: "Mine's End" }, // https://nethackwiki.com/wiki/Mines%27_End
   { name: 'Fort Ludios' }
 ];
@@ -80,7 +110,7 @@ MazesOfMenace.push({
       name: 'High Cleric of Moloch',
       species: 'human',
       level: 25,
-      relationship: 'Guide',
+      relationship: 'Local Guide',
       extraChoices: [GivingAmuletOfYendor]
     }
   ]

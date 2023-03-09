@@ -39,11 +39,11 @@ export const Empty = (): GameState => {
 export const Begin = (): GameState => {
   const party: FormCharacter[] = [
     {
-      name: 'Guide',
+      name: 'Scholar of the M.O.M.',
       role: 'Archeologist',
       level: 10,
       species: 'gnome',
-      relationship: 'Guide'
+      relationship: 'Local Guide'
     },
     {
       // https://nethackwiki.com/wiki/Player
