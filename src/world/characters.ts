@@ -33,7 +33,7 @@ interface Attributes {
 
 type Relationship =
   | 'Party Member'
-  | 'Guide'
+  | 'Local Guide'
   | 'Enemy'
   | 'Resident'
   | 'Shopkeeper';
@@ -128,16 +128,17 @@ export function Display(c: Character): { char: string } {
   if (c.name === 'You') {
     return { char: '@' };
   }
-  if (c.name === 'Guide') {
-    return { char: 'G' };
-  }
 
   const SpeciesCharMap = new Map<Species, string>([
     ['dog', 'd'],
     ['cat', 'f'],
     ['pony', 'u'],
     ['dwarf', 'h'],
-    ['human', '@']
+    ['human', '@'],
+    ['elf', '@'],
+    ['gnome', 'G'],
+    ['orc', 'o'],
+    ['owlbear', 'Y']
   ]);
   const char = SpeciesCharMap.get(c.species);
   if (char) {

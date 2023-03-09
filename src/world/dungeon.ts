@@ -80,7 +80,7 @@ MazesOfMenace.push({
       name: 'High Cleric of Moloch',
       species: 'human',
       level: 25,
-      relationship: 'Guide',
+      relationship: 'Local Guide',
       extraChoices: [GivingAmuletOfYendor]
     }
   ]

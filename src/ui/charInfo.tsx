@@ -40,6 +40,9 @@ export function RenderCharInfo(c?: World.Character): JSX.Element {
       <CharInfoLine>{c.name}</CharInfoLine>
       <CharInfoLine>{c.species}</CharInfoLine>
       <CharInfoLine>{c.role}</CharInfoLine>
+      <CharInfoLine style={{ fontStyle: 'italic' }}>
+        {c.relationship}
+      </CharInfoLine>
       <CharInfoLine>
         Level:{Math.floor(c.level)} XP:{Math.floor(World.getXP(c))}
       </CharInfoLine>
