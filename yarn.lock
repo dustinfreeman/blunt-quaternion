@@ -7910,6 +7910,11 @@ rollup@^2.43.1:
   optionalDependencies:
     fsevents "~2.3.2"
 
+rot-js@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/rot-js/-/rot-js-2.2.0.tgz#75f794822a2052e6f5a7c8a5594da44d7bc79528"
+  integrity sha512-DlqvRiOl3LnwTuActd+nMcj9tt9uycPaDezb2bJVDqXMdPJ2dkO3daJ5c/q+fYcKvIY9P5FUl9Tp24llClUFig==
+
 run-parallel@^1.1.9:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/run-parallel/-/run-parallel-1.2.0.tgz#66d1368da7bdf921eb9d95bd1a9229e7f21a43ee"

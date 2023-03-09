@@ -31,11 +31,13 @@ const Canvas = styled.canvas({
 export const Overlay = styled.div({
   ...ParentFill,
   position: 'absolute',
+  pointerEvents: 'none',
   top: '0',
   left: '0',
   width: width + 'px',
   height: height + 'px',
-  backgroundColor: '#ff000009'
+  backgroundColor: '#ff000009',
+  textAlign: 'center'
 });
 
 export function RootDiv(props: {
