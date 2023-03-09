@@ -1,0 +1,43 @@
+{
+  "extends": [
+    "eslint:recommended", // Good standard base of rules to use by default
+    "plugin:react/recommended",
+    // The prettier shareable configs need to come last
+    "prettier"
+  ],
+  "rules": {
+    // My preferred rules
+    // "no-console": "warn",
+    "no-var": "error", // preference for let and const only
+    "prefer-const": "error",
+    "eqeqeq": "warn", // warn to use === instead of ==
+    "camelcase": "error",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { "varsIgnorePattern": "_", "ignoreRestSiblings": false }
+    ],
+    "react-hooks/rules-of-hooks": "error",
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
+    ]
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2018, // Use the latest version ESLint understands
+    "sourceType": "module" // We're using import/export, etc
+  },
+  "plugins": ["@typescript-eslint", "react-hooks", "prettier"],
+  "env": {
+    "es6": true, // Since we're using ES6+ features like Async/Await
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "JSX": true,
+    "DOMHighResTimeStamp": true
+  }
+}
