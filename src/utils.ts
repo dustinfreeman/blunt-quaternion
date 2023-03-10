@@ -41,4 +41,7 @@ export class Meter {
   update(delta: number) {
     this.current = ROT.Util.clamp(this.current + delta, 0, this.max);
   }
+  frac() {
+    return this.current / this.max;
+  }
 }

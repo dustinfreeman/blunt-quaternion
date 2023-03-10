@@ -18,6 +18,13 @@ export function ChoicesFor(char: Character, game: GameState): Choice[] {
       }
     }
     // {
+    //   buttonText: "I'm going to drink this dubious potion",
+    //   made: (game) => {
+    //     char.hp.update(-2);
+    //     return { gameState: game, bluntConsumed: 0.05 };
+    //   }
+    // }
+    // {
     //   buttonText: 'YASD',
     //   made: (game) => {
     //     const deadParty = game.party;

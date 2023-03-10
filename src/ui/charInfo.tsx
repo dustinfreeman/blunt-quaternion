@@ -33,7 +33,11 @@ export function RenderCharInfo(c?: World.Character): JSX.Element {
       <CharInfoLine>
         Level:{Math.floor(c.level)} XP:{Math.floor(World.getXP(c))}
       </CharInfoLine>
-      <CharInfoLine>
+      <CharInfoLine
+        style={{
+          color:
+            c.hp.frac() > 0.66 ? 'white' : c.hp.frac() > 0.33 ? 'yellow' : 'red'
+        }}>
         HP: {c.hp.current}/{c.hp.max}
       </CharInfoLine>
     </CharInfoArea>
