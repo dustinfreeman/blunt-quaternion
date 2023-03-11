@@ -106,10 +106,14 @@ export function FleshOut(chars: FormCharacter[]): Character[] {
 
     if (c.name === 'You') {
       charChoices.push({
-        buttonText: 'Let me tell you of the beauty of Elbereth, maaan',
+        buttonText: 'Let me tell you of the beauty of Elbereth, man',
         made: () => {
-          //TODO: Elbereth - reduces damage taken on next delve
-          return { bluntConsumed: 0.5 };
+          return {
+            gameState: { elberethed: true },
+            bluntConsumed: 0.5,
+            choiceResultMessage:
+              'I have asked Elbereth to protect us this delve'
+          };
         }
       });
     }

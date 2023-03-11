@@ -209,25 +209,31 @@ function App() {
     inventory.push(...randomChoices(World.LootList, 1));
 
     //Combat Simulation
-    party.forEach((c: World.Character) => {
-      const combatIncidence =
-        (c.tactics.aggression + 0.25) *
-        (game.currentDungeonLevel + 1) *
-        ROT.RNG.getUniform();
+    const simulateCombat = () => {
+      //TODO: assemble total combat power.
+      party.forEach((c: World.Character) => {
+        const combatIncidence =
+          (c.tactics.aggression + 0.25) *
+          (game.currentDungeonLevel + 1) *
+          ROT.RNG.getUniform();
 
-      //how much damage you took
-      c.hp.update(Math.round(ROT.RNG.getUniform() * -3 * combatIncidence));
-      //how much good you did
-      const strengthScaling = 2 * ((c.attributes.STR.val() - 10) / 10);
-      let wisdomScaling = 1;
-      if (c.role && ['Valkyrie', 'Wizard'].includes(c.role)) {
-        wisdomScaling *= 2 * ((c.attributes.WIS.val() - 10) / 10);
-      }
-      World.addXP(
-        c,
-        Math.round(combatIncidence * 4 * strengthScaling * wisdomScaling)
-      );
-    });
+        //how much damage you took
+        c.hp.update(Math.round(ROT.RNG.getUniform() * -3 * combatIncidence));
+        //how much good you did
+        const strengthScaling = 2 * ((c.attributes.STR.val() - 10) / 10);
+        let wisdomScaling = 1;
+        if (c.role && ['Valkyrie', 'Wizard'].includes(c.role)) {
+          wisdomScaling *= 2 * ((c.attributes.WIS.val() - 10) / 10);
+        }
+        World.addXP(
+          c,
+          Math.round(combatIncidence * 4 * strengthScaling * wisdomScaling)
+        );
+      });
+    };
+    if (!game.elberethed || ROT.RNG.getUniform() < 0.2) {
+      simulateCombat();
+    }
     //Remove dead party members
     const freshCorpses = party.filter((p) => p.hp.current <= 0);
     filterInPlace(party, (p) => p.hp.current > 0);
@@ -279,7 +285,10 @@ function App() {
         //reset quaternion for next blaze
         quaternionIndex: ROT.RNG.getUniformInt(0, game.party.length - 1),
         bluntFraction: 1,
-        lastChoiceResult: ''
+        lastChoiceResult: game.elberethed
+          ? 'Thank Elbereth for protecting us'
+          : '',
+        elberethed: false
       });
     }, 500);
   }, [game, setGame]);

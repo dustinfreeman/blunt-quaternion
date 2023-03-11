@@ -17,6 +17,7 @@ export interface GameState {
   inventory: Item[];
   currentDungeonLevel: number;
   delveDirection: number;
+  elberethed: boolean;
   //current quaternion:
   quaternionIndex: number;
   bluntFraction: number;
@@ -30,6 +31,7 @@ export const Empty = (): GameState => {
     inventory: [],
     currentDungeonLevel: -1,
     delveDirection: 1,
+    elberethed: false,
     quaternionIndex: 0,
     bluntFraction: 0,
     lastChoiceResult: ''
@@ -78,6 +80,7 @@ export const Begin = (): GameState => {
     inventory: [],
     currentDungeonLevel: 0,
     delveDirection: 1,
+    elberethed: false,
     quaternionIndex: 0,
     bluntFraction: 1,
     lastChoiceResult: ''
