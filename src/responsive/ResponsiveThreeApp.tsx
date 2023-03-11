@@ -45,7 +45,6 @@ export function RootDivWithThree(props: {
     renderer.setSize(width, height);
     threeCanvas = renderer.domElement;
     threeCanvasMountPoint.current?.appendChild(threeCanvas);
-    console.log('mounted!', threeCanvas);
 
     function animate() {
       requestAnimationFrame(animate);
