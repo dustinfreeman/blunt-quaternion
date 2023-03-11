@@ -7,13 +7,18 @@ import * as World from '../world';
 export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
   const _choiceList: Choice[] = [
     {
-      buttonText: 'Think Deeply...',
+      buttonText: 'Think deep thoughts',
       made: (game) => {
         return {
           gameState: game,
-          bluntConsumed: 0.7,
-          //TODO: Excercise WIS
-          choiceResultMessage: 'I am a ' + char.species
+          bluntConsumed: 0.25,
+          choiceResultMessage:
+            (char.attributes.WIS.val() < 17
+              ? 'I am a ' + char.species
+              : 'I am a simulated ' +
+                char.species +
+                ' in a virtual environment.') +
+            (char.attributes.WIS.exercise(0.3) ? ' (my wisdom increased!)' : '')
         };
       }
     }

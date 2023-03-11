@@ -217,7 +217,7 @@ function App() {
       //how much damage you took
       c.hp.update(Math.round(ROT.RNG.getUniform() * -3 * combatIncidence));
       //how much good you did
-      const strengthScaling = 2 * ((c.attributes.STR - 10) / 10);
+      const strengthScaling = 2 * ((c.attributes.STR.val() - 10) / 10);
       World.addXP(c, Math.round(combatIncidence * 4 * strengthScaling));
     });
     //Remove dead party members

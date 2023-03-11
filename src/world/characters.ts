@@ -1,5 +1,6 @@
 import { Choice } from '../choices/ui';
 import { Meter } from '../utils';
+import { AttrBlock, AttrsDefault } from './attributes';
 
 // https://nethackwiki.com/wiki/Role
 // https://nethackwiki.com/wiki/Role_difficulty#Role_difficulty_statistics
@@ -14,11 +15,6 @@ export const Monsters = ['owlbear'];
 const SpeciesList = [undefined, ...PlayerSpeciesList, ...Pets, ...Monsters];
 export type Species = (typeof SpeciesList)[number];
 
-interface Attributes {
-  // https://nethackwiki.com/wiki/Attribute
-  STR: number;
-}
-
 type Relationship =
   | 'Party Member'
   | 'Local Guide'
@@ -32,7 +28,7 @@ export interface Character {
   role: Role;
   level: number;
   hp: Meter;
-  attributes: Attributes;
+  attributes: AttrBlock;
   relationship: Relationship;
   tactics: {
     aggression: number;
@@ -86,14 +82,13 @@ export function FleshOut(chars: FormCharacter[]): Character[] {
         buttonText: barkable,
         made: (game) => {
           const char = game.party[game.quaternionIndex];
-          //excercising
-          const newSTR = char.attributes.STR + 0.3;
-          const excerciseAttrUp =
-            Math.floor(char.attributes.STR) < Math.floor(newSTR);
+
+          //exercising
           const choiceMessage =
             barkable +
-            (excerciseAttrUp ? ' (and their strength increased!)' : '');
-          char.attributes.STR = newSTR;
+            (char.attributes.STR.exercise(0.3)
+              ? ' (my strength increased!)'
+              : '');
           return {
             gameState: game,
             bluntConsumed: 0.05,
@@ -117,7 +112,7 @@ export function FleshOut(chars: FormCharacter[]): Character[] {
       //defaults first...
       role: undefined,
       relationship: 'Party Member',
-      attributes: { STR: 10 },
+      attributes: AttrsDefault(),
       //HACK:  https://nethackwiki.com/wiki/Hit_points#Hit_points_gained_on_level_gain_and_starting_hitpoints
       hp: new Meter(c.level * 4),
       tactics: { aggression: 0.2, looting: 0.2 },
