@@ -180,7 +180,8 @@ function App() {
   const makeChoice = useCallback(
     (choiceResult: Choices.ChoiceResult) => {
       setGame({
-        ...(choiceResult.gameState ?? game),
+        ...game,
+        ...choiceResult.gameState,
         bluntFraction: game.bluntFraction - choiceResult.bluntConsumed,
         lastChoiceResult: choiceResult.choiceResultMessage ?? ''
       });

@@ -107,9 +107,9 @@ export function FleshOut(chars: FormCharacter[]): Character[] {
     if (c.name === 'You') {
       charChoices.push({
         buttonText: 'Let me tell you of the beauty of Elbereth, maaan',
-        made: (game) => {
-          //TODO: Elbereth - maybe kicks enemies out of the circle?
-          return { gameState: game, bluntConsumed: 0.5 };
+        made: () => {
+          //TODO: Elbereth - reduces damage taken on next delve
+          return { bluntConsumed: 0.5 };
         }
       });
     }

@@ -76,7 +76,6 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
             const onConsumeMessage = randomToConsume.onConsume?.(char);
             return {
               gameState: {
-                ...game,
                 inventory: game.inventory.filter(
                   (item) => item !== randomToConsume
                 )

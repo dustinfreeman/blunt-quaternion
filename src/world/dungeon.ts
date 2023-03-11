@@ -91,11 +91,8 @@ const GivingAmuletOfYendor: Choice = {
     return !alreadyHaveAmulet;
   },
   made: (game) => {
+    game.inventory.push(AmuletOfYendor);
     return {
-      gameState: {
-        ...game,
-        inventory: [...game.inventory, AmuletOfYendor]
-      },
       bluntConsumed: 0.1,
       choiceResultMessage:
         'Congratulations, you feel you should get out of here...'
