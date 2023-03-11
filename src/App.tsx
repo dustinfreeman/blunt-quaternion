@@ -332,9 +332,11 @@ function App() {
     if (game.currentDungeonLevel >= World.MazesOfMenace.length - 1) {
       changeDelveDirectionMaybe = { delveDirection: -1 };
     }
-    const moveDelta = Math.floor(0.9 + ROT.RNG.getUniform() * 1.2);
+    //TODO: bring back stochastic delving depth.
+    // const delveDelta = Math.floor(0.9 + ROT.RNG.getUniform() * 1.2);
+    const delveDelta = 1;
     const nextDungeonLevel = Math.min(
-      game.currentDungeonLevel + moveDelta * game.delveDirection,
+      game.currentDungeonLevel + delveDelta * game.delveDirection,
       World.MazesOfMenace.length - 1
     );
 
