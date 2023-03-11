@@ -150,14 +150,18 @@ function App() {
       setChoiceList([]);
       return;
     }
-    const _choiceList: Choices.Choice[] = Choices.ChoicesFor(char, game);
 
+    if (game.followUpChoices.length > 0) {
+      setChoiceList(ROT.RNG.shuffle(game.followUpChoices));
+      return;
+    }
+
+    const _choiceList: Choices.Choice[] = Choices.ChoicesFor(char, game);
     //filter choices for relevance
     filterInPlace(
       _choiceList,
       (_choice) => !_choice.relevant || _choice.relevant(char, game)
     );
-
     setChoiceList(ROT.RNG.shuffle(randomChoices(_choiceList, 3)));
   }
   useEffect(() => {
@@ -181,6 +185,7 @@ function App() {
     (choiceResult: Choices.ChoiceResult) => {
       setGame({
         ...game,
+        followUpChoices: [],
         ...choiceResult.gameState,
         bluntFraction: game.bluntFraction - choiceResult.bluntConsumed,
         lastChoiceResult: choiceResult.choiceResultMessage ?? ''

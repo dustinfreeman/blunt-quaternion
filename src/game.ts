@@ -10,6 +10,7 @@ import {
   Species,
   Item
 } from './world';
+import * as Choices from './choices';
 
 export interface GameState {
   party: Character[];
@@ -22,6 +23,7 @@ export interface GameState {
   quaternionIndex: number;
   bluntFraction: number;
   lastChoiceResult: string;
+  followUpChoices: Choices.Choice[];
 }
 
 export const Empty = (): GameState => {
@@ -34,7 +36,8 @@ export const Empty = (): GameState => {
     elberethed: false,
     quaternionIndex: 0,
     bluntFraction: 0,
-    lastChoiceResult: ''
+    lastChoiceResult: '',
+    followUpChoices: []
   };
 };
 
@@ -83,6 +86,7 @@ export const Begin = (): GameState => {
     elberethed: false,
     quaternionIndex: 0,
     bluntFraction: 1,
-    lastChoiceResult: ''
+    lastChoiceResult: '',
+    followUpChoices: []
   };
 };
