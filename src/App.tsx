@@ -1,5 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import * as ROT from 'rot-js';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+// import { Canvas, useFrame, ThreeElements } from '@react-three/fiber';
+//Local:
 import * as UI from './ui';
 import * as ResponsiveApp from './ResponsiveApp';
 import * as Game from './game';
@@ -8,6 +12,20 @@ import * as Comms from './comms';
 import * as Choices from './choices';
 import { filterInPlace, randomChoices } from './utils';
 
+const scene = new THREE.Scene();
+
+const camera = new THREE.PerspectiveCamera(
+  75,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+camera.position.z = 2;
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+// =====================================================================
 const debug = false;
 
 const cValRand = () => {
@@ -18,12 +36,68 @@ const cValRand = () => {
 
 function App() {
   const canvasRef = React.createRef<HTMLCanvasElement>();
+  const threeCanvasRef = React.createRef<HTMLCanvasElement>();
+  const threeCanvasEl = React.createRef<HTMLDivElement>();
+  const threeCanvasMountPoint = React.createRef<HTMLDivElement>();
+
+  //"run once"
+  useEffect(() => {
+    if (
+      !threeCanvasMountPoint.current ||
+      threeCanvasMountPoint.current.childNodes.length > 0
+    ) {
+      return;
+    }
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      ResponsiveApp.width / ResponsiveApp.height,
+      0.1,
+      1000
+    );
+
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(ResponsiveApp.width, ResponsiveApp.height);
+    const canvas = renderer.domElement;
+    threeCanvasMountPoint.current.appendChild(canvas);
+    console.log('mounted!', canvas);
+
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+    scene.background = new THREE.Color(0xffbbaa);
+
+    camera.position.z = 5;
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      cube.rotation.x += 0.01;
+      cube.rotation.y += 0.01;
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // const threeCanvas = new ThreeCanvas({
+    //   mountPoint: threeCanvasEl.current,
+    //   width: threeCanvasEl.current.clientWidth,
+    //   height: threeCanvasEl.current.clientHeight
+    // });
+    // const renderLoop = () => {
+    //   threeCanvas.render();
+    // };
+    // threeCanvas.setAnimationLoop(renderLoop);
+  }, [threeCanvasMountPoint]);
+  // ======================================================
 
   const [bgColors, setBGColors] = useState({
     c1: ROT.Color.add([0, 0, 0]),
     c2: ROT.Color.add([0, 0, 0])
   });
-
   useEffect(() => {
     const canvas = canvasRef?.current;
     if (!canvas) {
@@ -64,6 +138,7 @@ function App() {
         );
       }
     }
+    //TODO: should use a deps list to ensure this re-renders properly
   });
 
   const [game, setGame] = useState<Game.GameState>(Game.Empty());
@@ -120,6 +195,7 @@ function App() {
       <UI.DelveButton onClick={StartGame}>Begin...</UI.DelveButton>
     </ResponsiveApp.Overlay>
   );
+
   //HACK: game start
   // useEffect(() => {
   //   if (game.party.length === 0) {
@@ -352,39 +428,46 @@ function App() {
 
   return (
     <ResponsiveApp.RootDiv canvasRef={canvasRef}>
-      <ResponsiveApp.Overlay>
-        {game.currentDungeonLevel < 0 && StartScreen}
-        {game.currentDungeonLevel >= 0 && PlayingScreen}
-        {debug && (
-          <ResponsiveApp.Overlay>
-            <UI._BaseButton
-              onClick={() => {
-                game.party.forEach((c) => c.hp.update(-1000));
-              }}>
-              Kill Party
-            </UI._BaseButton>
-          </ResponsiveApp.Overlay>
-        )}
-        {showHelp && (
-          <ResponsiveApp.Overlay style={{ backgroundColor: 'darkslateblue' }}>
-            <UI.Title>Help?</UI.Title>
-            <UI._BaseButton
-              onClick={() => {
-                setShowHelp(false);
-                restartGame();
-              }}>
-              Restart Game
-            </UI._BaseButton>
-          </ResponsiveApp.Overlay>
-        )}
-        <UI.HelpButton
-          onClick={() => {
-            setShowHelp(!showHelp);
-          }}>
-          {'_?_'}
-        </UI.HelpButton>
-      </ResponsiveApp.Overlay>
+      <ResponsiveApp.Overlay
+        ref={threeCanvasMountPoint}></ResponsiveApp.Overlay>
     </ResponsiveApp.RootDiv>
+    /*
+      {
+        <ResponsiveApp.Overlay>
+          {game.currentDungeonLevel < 0 && StartScreen}
+          {game.currentDungeonLevel >= 0 && PlayingScreen}
+          {debug && (
+            <ResponsiveApp.Overlay>
+              <UI._BaseButton
+                onClick={() => {
+                  game.party.forEach((c) => c.hp.update(-1000));
+                }}>
+                Kill Party
+              </UI._BaseButton>
+            </ResponsiveApp.Overlay>
+          )}
+          {showHelp && (
+            <ResponsiveApp.Overlay style={{ backgroundColor: 'darkslateblue' }}>
+              <UI.Title>Help?</UI.Title>
+              <UI._BaseButton
+                onClick={() => {
+                  setShowHelp(false);
+                  restartGame();
+                }}>
+                Restart Game
+              </UI._BaseButton>
+            </ResponsiveApp.Overlay>
+          )}
+          <UI.HelpButton
+            onClick={() => {
+              setShowHelp(!showHelp);
+            }}>
+            {'_?_'}
+          </UI.HelpButton>
+        </ResponsiveApp.Overlay>
+      }
+      */ //{' '}
+    // </ResponsiveApp.RootDiv>
   );
 }
 

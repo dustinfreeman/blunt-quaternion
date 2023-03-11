@@ -67,7 +67,7 @@ export function RootDiv(props: {
   });
   return (
     <Root ref={appContainerRef}>
-      <Canvas ref={props.canvasRef} width={width} height={height} />
+      {/* <Canvas ref={props.canvasRef} width={width} height={height} /> */}
       {props.children}
     </Root>
   );
