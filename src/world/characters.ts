@@ -4,7 +4,14 @@ import { AttrBlock, AttrsDefault } from './attributes';
 
 // https://nethackwiki.com/wiki/Role
 // https://nethackwiki.com/wiki/Role_difficulty#Role_difficulty_statistics
-export const Roles = [undefined, 'Ranger', 'Rogue', 'Valkyrie', 'Archeologist'];
+export const Roles = [
+  undefined,
+  'Ranger',
+  'Rogue',
+  'Valkyrie',
+  'Archeologist',
+  'Wizard'
+];
 export type Role = (typeof Roles)[number];
 
 // https://nethackwiki.com/wiki/Race

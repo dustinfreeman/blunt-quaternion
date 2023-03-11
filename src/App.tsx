@@ -218,7 +218,14 @@ function App() {
       c.hp.update(Math.round(ROT.RNG.getUniform() * -3 * combatIncidence));
       //how much good you did
       const strengthScaling = 2 * ((c.attributes.STR.val() - 10) / 10);
-      World.addXP(c, Math.round(combatIncidence * 4 * strengthScaling));
+      let wisdomScaling = 1;
+      if (c.role && ['Valkyrie', 'Wizard'].includes(c.role)) {
+        wisdomScaling *= 2 * ((c.attributes.WIS.val() - 10) / 10);
+      }
+      World.addXP(
+        c,
+        Math.round(combatIncidence * 4 * strengthScaling * wisdomScaling)
+      );
     });
     //Remove dead party members
     const freshCorpses = party.filter((p) => p.hp.current <= 0);
