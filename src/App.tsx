@@ -34,18 +34,22 @@ const cValRand = () => {
   return ROT.RNG.getUniformInt(cMin, cMax);
 };
 
+let threeCanvas: HTMLCanvasElement | undefined = undefined;
+
 function App() {
   const canvasRef = React.createRef<HTMLCanvasElement>();
-  const threeCanvasRef = React.createRef<HTMLCanvasElement>();
-  const threeCanvasEl = React.createRef<HTMLDivElement>();
   const threeCanvasMountPoint = React.createRef<HTMLDivElement>();
 
   //"run once"
   useEffect(() => {
-    if (
-      !threeCanvasMountPoint.current ||
-      threeCanvasMountPoint.current.childNodes.length > 0
-    ) {
+    console.log(
+      'test',
+      threeCanvasMountPoint.current,
+      threeCanvasMountPoint.current?.childNodes.length
+    );
+
+    //want to prevent re-run if the scene has already been added to the DOM...
+    if (threeCanvas) {
       return;
     }
 
@@ -59,9 +63,9 @@ function App() {
 
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(ResponsiveApp.width, ResponsiveApp.height);
-    const canvas = renderer.domElement;
-    threeCanvasMountPoint.current.appendChild(canvas);
-    console.log('mounted!', canvas);
+    threeCanvas = renderer.domElement;
+    threeCanvasMountPoint.current?.appendChild(threeCanvas);
+    console.log('mounted!', threeCanvas);
 
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
