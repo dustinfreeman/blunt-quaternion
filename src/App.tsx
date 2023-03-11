@@ -1,32 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import * as ROT from 'rot-js';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-// import { Canvas, useFrame, ThreeElements } from '@react-three/fiber';
 //Local:
 import * as UI from './ui';
-import * as ResponsiveApp from './ResponsiveApp';
+import * as ResponsiveApp from './responsive';
 import * as Game from './game';
 import * as World from './world';
 import * as Comms from './comms';
 import * as Choices from './choices';
 import { filterInPlace, randomChoices } from './utils';
-
-const scene = new THREE.Scene();
-
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
-camera.position.z = 2;
-
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-
-// =====================================================================
-const debug = false;
 
 const cValRand = () => {
   const cMin = 5;
@@ -42,12 +24,6 @@ function App() {
 
   //"run once"
   useEffect(() => {
-    console.log(
-      'test',
-      threeCanvasMountPoint.current,
-      threeCanvasMountPoint.current?.childNodes.length
-    );
-
     //want to prevent re-run if the scene has already been added to the DOM...
     if (threeCanvas) {
       return;
@@ -85,16 +61,6 @@ function App() {
     }
 
     animate();
-
-    // const threeCanvas = new ThreeCanvas({
-    //   mountPoint: threeCanvasEl.current,
-    //   width: threeCanvasEl.current.clientWidth,
-    //   height: threeCanvasEl.current.clientHeight
-    // });
-    // const renderLoop = () => {
-    //   threeCanvas.render();
-    // };
-    // threeCanvas.setAnimationLoop(renderLoop);
   }, [threeCanvasMountPoint]);
   // ======================================================
 
@@ -432,46 +398,39 @@ function App() {
 
   return (
     <ResponsiveApp.RootDiv canvasRef={canvasRef}>
-      <ResponsiveApp.Overlay
-        ref={threeCanvasMountPoint}></ResponsiveApp.Overlay>
+      <ResponsiveApp.Overlay ref={threeCanvasMountPoint}>
+        {game.currentDungeonLevel < 0 && StartScreen}
+        {game.currentDungeonLevel >= 0 && PlayingScreen}
+        {/* {
+          <ResponsiveApp.Overlay>
+            <UI._BaseButton
+              onClick={() => {
+                game.party.forEach((c) => c.hp.update(-1000));
+              }}>
+              Kill Party
+            </UI._BaseButton>
+          </ResponsiveApp.Overlay>
+        } */}
+        {showHelp && (
+          <ResponsiveApp.Overlay style={{ backgroundColor: 'darkslateblue' }}>
+            <UI.Title>Help?</UI.Title>
+            <UI._BaseButton
+              onClick={() => {
+                setShowHelp(false);
+                restartGame();
+              }}>
+              Restart Game
+            </UI._BaseButton>
+          </ResponsiveApp.Overlay>
+        )}
+        <UI.HelpButton
+          onClick={() => {
+            setShowHelp(!showHelp);
+          }}>
+          {'_?_'}
+        </UI.HelpButton>
+      </ResponsiveApp.Overlay>
     </ResponsiveApp.RootDiv>
-    /*
-      {
-        <ResponsiveApp.Overlay>
-          {game.currentDungeonLevel < 0 && StartScreen}
-          {game.currentDungeonLevel >= 0 && PlayingScreen}
-          {debug && (
-            <ResponsiveApp.Overlay>
-              <UI._BaseButton
-                onClick={() => {
-                  game.party.forEach((c) => c.hp.update(-1000));
-                }}>
-                Kill Party
-              </UI._BaseButton>
-            </ResponsiveApp.Overlay>
-          )}
-          {showHelp && (
-            <ResponsiveApp.Overlay style={{ backgroundColor: 'darkslateblue' }}>
-              <UI.Title>Help?</UI.Title>
-              <UI._BaseButton
-                onClick={() => {
-                  setShowHelp(false);
-                  restartGame();
-                }}>
-                Restart Game
-              </UI._BaseButton>
-            </ResponsiveApp.Overlay>
-          )}
-          <UI.HelpButton
-            onClick={() => {
-              setShowHelp(!showHelp);
-            }}>
-            {'_?_'}
-          </UI.HelpButton>
-        </ResponsiveApp.Overlay>
-      }
-      */ //{' '}
-    // </ResponsiveApp.RootDiv>
   );
 }
 

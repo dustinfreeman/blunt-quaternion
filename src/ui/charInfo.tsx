@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import * as World from '../world';
-import * as ResponsiveApp from '../ResponsiveApp';
+import * as ResponsiveApp from '../responsive';
 
 const CharInfoArea = styled.div({
   backgroundColor: '#0005',
