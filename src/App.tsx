@@ -1,42 +1,53 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import * as ROT from 'rot-js';
+import * as THREE from 'three';
+//Local:
 import * as UI from './ui';
-import * as ResponsiveApp from './ResponsiveApp';
+import * as ResponsiveApp from './responsive';
 import * as Game from './game';
 import * as World from './world';
 import * as Comms from './comms';
 import * as Choices from './choices';
 import { filterInPlace, randomChoices } from './utils';
-
-const debug = false;
-
-const cValRand = () => {
-  const cMin = 5;
-  const cMax = 120;
-  return ROT.RNG.getUniformInt(cMin, cMax);
-};
+import { scene, camera, createRandomLevel, animate } from './thirdDimension';
 
 function App() {
   const canvasRef = React.createRef<HTMLCanvasElement>();
 
+  const [game, setGame] = useState<Game.GameState>(Game.Empty());
+  const [charInfo, setCharInfo] = useState<JSX.Element>(<span></span>);
+  const [choiceList, setChoiceList] = useState<Choices.Choice[]>([]);
+
+  const cValRand = () => {
+    const cMin = 5;
+    const cMax = 200;
+    return ROT.RNG.getUniformInt(cMin, cMax);
+  };
   const [bgColors, setBGColors] = useState({
     c1: ROT.Color.add([0, 0, 0]),
-    c2: ROT.Color.add([0, 0, 0])
+    c2: ROT.Color.add([0, 0, 0]),
+    opacity: 1
   });
-
   useEffect(() => {
     const canvas = canvasRef?.current;
     if (!canvas) {
       return;
     }
-    const ctx = canvas.getContext('2d'); //, { alpha: false });
+    const ctx = canvas.getContext('2d');
     if (!ctx) {
       return;
     }
 
-    const arc = Math.abs(0.5 - game.quaternionIndex / game.party.length);
+    ctx.clearRect(0, 0, ResponsiveApp.width, ResponsiveApp.height);
+    const arc =
+      game.party.length > 0
+        ? Math.abs(0.5 - game.quaternionIndex / game.party.length)
+        : 0;
     const bgColor = ROT.Color.interpolate(bgColors.c1, bgColors.c2, arc);
-    ctx.fillStyle = ROT.Color.toHex(bgColor);
+    const fs =
+      ROT.Color.toHex(bgColor) +
+      (Math.floor(bgColors.opacity) * 255).toString(16).padStart(2, '0');
+    ctx.fillStyle = fs;
     ctx.fillRect(0, 0, ResponsiveApp.width, ResponsiveApp.height);
 
     if (game.party.length > 0 && game.currentDungeonLevel % 1 === 0) {
@@ -63,12 +74,15 @@ function App() {
           top
         );
       }
-    }
-  });
 
-  const [game, setGame] = useState<Game.GameState>(Game.Empty());
-  const [charInfo, setCharInfo] = useState<JSX.Element>(<span></span>);
-  const [choiceList, setChoiceList] = useState<Choices.Choice[]>([]);
+      const yawRadians =
+        (game.quaternionIndex / game.party.length) * 2 * Math.PI;
+      camera.setRotationFromEuler(
+        new THREE.Euler(Math.PI * 0.5, -yawRadians, 0)
+      );
+    }
+    //TODO: should use a deps list to ensure this re-renders properly
+  }, [game]);
 
   //game updated
   useEffect(() => {
@@ -86,7 +100,7 @@ function App() {
   }, [game]);
 
   //rotation animation
-  const rotateRate = 0.1;
+  const rotateRate = 0.08;
   useEffect(() => {
     const interval = setInterval(() => {
       const phase = game.quaternionIndex % 1;
@@ -102,7 +116,8 @@ function App() {
           //keep rotating
           setGame({
             ...game,
-            quaternionIndex: (game.quaternionIndex + 0.1) % game.party.length
+            quaternionIndex:
+              (game.quaternionIndex + rotateRate) % game.party.length
           });
         }
       }
@@ -111,21 +126,23 @@ function App() {
   });
 
   const StartGame = useCallback(() => {
+    createRandomLevel();
+
+    setBGColors({
+      c1: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
+      c2: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
+      opacity: 0.3
+    });
+
     setGame(Game.Begin());
   }, [game, setGame]);
 
   const StartScreen: JSX.Element = (
-    <ResponsiveApp.Overlay>
+    <ResponsiveApp.Overlay style={{ backgroundColor: 'black' }}>
       <UI.Title>Blunt Quaternion</UI.Title>
       <UI.DelveButton onClick={StartGame}>Begin...</UI.DelveButton>
     </ResponsiveApp.Overlay>
   );
-  //HACK: game start
-  // useEffect(() => {
-  //   if (game.party.length === 0) {
-  //     StartGame();
-  //   }
-  // });
 
   function refreshChoices() {
     const char = game.party[game.quaternionIndex];
@@ -176,7 +193,8 @@ function App() {
     //interm:
     setBGColors({
       c1: ROT.Color.add([0, 0, 0]),
-      c2: ROT.Color.add([0, 0, 0])
+      c2: ROT.Color.add([0, 0, 0]),
+      opacity: 0
     });
     setGame({
       ...game,
@@ -220,9 +238,11 @@ function App() {
     );
 
     setTimeout(() => {
+      createRandomLevel();
       setBGColors({
         c1: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
-        c2: ROT.Color.add([cValRand(), cValRand(), cValRand()])
+        c2: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
+        opacity: 0.3
       });
 
       //add to party from this level
@@ -299,7 +319,9 @@ function App() {
   );
 
   const DelvingScreen: JSX.Element = (
-    <UI.DungeonLevelTitle>Delving...</UI.DungeonLevelTitle>
+    <ResponsiveApp.Overlay style={{ backgroundColor: 'black' }}>
+      <UI.DungeonLevelTitle>Delving...</UI.DungeonLevelTitle>
+    </ResponsiveApp.Overlay>
   );
 
   const WinScreen: JSX.Element = (
@@ -351,40 +373,32 @@ function App() {
   const [showHelp, setShowHelp] = useState(false);
 
   return (
-    <ResponsiveApp.RootDiv canvasRef={canvasRef}>
-      <ResponsiveApp.Overlay>
-        {game.currentDungeonLevel < 0 && StartScreen}
-        {game.currentDungeonLevel >= 0 && PlayingScreen}
-        {debug && (
-          <ResponsiveApp.Overlay>
-            <UI._BaseButton
-              onClick={() => {
-                game.party.forEach((c) => c.hp.update(-1000));
-              }}>
-              Kill Party
-            </UI._BaseButton>
-          </ResponsiveApp.Overlay>
-        )}
-        {showHelp && (
-          <ResponsiveApp.Overlay style={{ backgroundColor: 'darkslateblue' }}>
-            <UI.Title>Help?</UI.Title>
-            <UI._BaseButton
-              onClick={() => {
-                setShowHelp(false);
-                restartGame();
-              }}>
-              Restart Game
-            </UI._BaseButton>
-          </ResponsiveApp.Overlay>
-        )}
-        <UI.HelpButton
-          onClick={() => {
-            setShowHelp(!showHelp);
-          }}>
-          {'_?_'}
-        </UI.HelpButton>
-      </ResponsiveApp.Overlay>
-    </ResponsiveApp.RootDiv>
+    <ResponsiveApp.RootDivWithThree
+      canvasRef={canvasRef}
+      scene={scene}
+      camera={camera}
+      animate={animate}>
+      {game.currentDungeonLevel < 0 && StartScreen}
+      {game.currentDungeonLevel >= 0 && PlayingScreen}
+      {showHelp && (
+        <ResponsiveApp.Overlay style={{ backgroundColor: 'darkslateblue' }}>
+          <UI.Title>Help?</UI.Title>
+          <UI._BaseButton
+            onClick={() => {
+              setShowHelp(false);
+              restartGame();
+            }}>
+            Restart Game
+          </UI._BaseButton>
+        </ResponsiveApp.Overlay>
+      )}
+      <UI.HelpButton
+        onClick={() => {
+          setShowHelp(!showHelp);
+        }}>
+        {'_?_'}
+      </UI.HelpButton>
+    </ResponsiveApp.RootDivWithThree>
   );
 }
 

@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import styled, { CSSObject } from 'styled-components';
-import './App.css';
+// import './App.css';
 
 export const width = 300;
 export const height = 225;
 
-const Root = styled.div({
+export const Root = styled.div({
   display: 'block',
   textAlign: 'center',
   verticalAlign: 'middle',
@@ -24,7 +24,7 @@ export const ParentFill: CSSObject = {
   positive: 'relative'
 };
 
-const Canvas = styled.canvas({
+export const FillCanvas = styled.canvas({
   ...ParentFill
 });
 
@@ -67,7 +67,7 @@ export function RootDiv(props: {
   });
   return (
     <Root ref={appContainerRef}>
-      <Canvas ref={props.canvasRef} width={width} height={height} />
+      <FillCanvas ref={props.canvasRef} width={width} height={height} />
       {props.children}
     </Root>
   );

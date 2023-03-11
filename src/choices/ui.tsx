@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import * as UI from '../ui';
-import * as ResponsiveApp from '../ResponsiveApp';
+import * as ResponsiveApp from '../responsive';
 import { GameState } from '../game';
 import * as World from '../world';
 

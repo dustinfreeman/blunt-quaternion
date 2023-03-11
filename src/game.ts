@@ -39,7 +39,7 @@ export const Empty = (): GameState => {
 export const Begin = (): GameState => {
   const party: FormCharacter[] = [
     {
-      name: 'Scholar of the M.O.M.',
+      name: 'Scholar of the M.o.M.',
       role: 'Archeologist',
       level: 10,
       species: 'gnome',
