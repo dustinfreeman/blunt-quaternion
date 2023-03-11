@@ -97,7 +97,6 @@ export function FleshOut(chars: FormCharacter[]): Character[] {
               ? ' (my strength increased!)'
               : '');
           return {
-            gameState: game,
             bluntConsumed: 0.05,
             choiceResultMessage: choiceMessage
           };

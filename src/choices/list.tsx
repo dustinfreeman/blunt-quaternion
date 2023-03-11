@@ -8,9 +8,8 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
   const _choiceList: Choice[] = [
     {
       buttonText: 'Think deep thoughts',
-      made: (game) => {
+      made: () => {
         return {
-          gameState: game,
           bluntConsumed: 0.25,
           choiceResultMessage:
             (char.attributes.WIS.val() < 17
@@ -92,14 +91,13 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
     if (char.tactics.aggression < 1) {
       _choiceList.push({
         buttonText: 'I should be more aggressive.',
-        made: (game) => {
+        made: () => {
           char.tactics.aggression = ROT.Util.clamp(
             char.tactics.aggression + 0.25,
             0,
             1
           );
           return {
-            gameState: game,
             bluntConsumed: 0.1,
             choiceResultMessage: 'grrr!'
           };
@@ -109,14 +107,13 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
     if (char.tactics.aggression > 0) {
       _choiceList.push({
         buttonText: 'I should be less aggressive.',
-        made: (game) => {
+        made: () => {
           char.tactics.aggression = ROT.Util.clamp(
             char.tactics.aggression - 0.25,
             0,
             1
           );
           return {
-            gameState: game,
             bluntConsumed: 0.3,
             choiceResultMessage: 'I will try to get into less confrontations.'
           };

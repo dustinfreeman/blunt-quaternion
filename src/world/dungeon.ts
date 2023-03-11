@@ -58,9 +58,8 @@ export const MazesOfMenace: DungeonLevel[] = [
         extraChoices: [
           {
             buttonText: 'Allow me to provide you a consultation',
-            made: (game) => {
+            made: () => {
               return {
-                gameState: game,
                 bluntConsumed: 0.2,
                 // https://nethackwiki.com/wiki/Source:NetHack_3.6.1/dat/oracles.txt
                 choiceResultMessage:
