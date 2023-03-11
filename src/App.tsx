@@ -211,7 +211,7 @@ function App() {
     const party = ROT.RNG.shuffle(game.party);
     //Loot Simulation
     const inventory = game.inventory;
-    inventory.push(...randomChoices(World.LootList, 1));
+    inventory.push(...randomChoices(World.LootList, 2));
 
     //Combat Simulation
     const simulateCombat = () => {

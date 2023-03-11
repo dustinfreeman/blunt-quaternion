@@ -2,6 +2,7 @@ import * as ROT from 'rot-js';
 
 import { Choice } from '.';
 import { GameState } from '../game';
+import { randomChoices } from '../utils';
 import * as World from '../world';
 
 export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
@@ -64,6 +65,30 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
 
   if (char.relationship === 'Party Member') {
     if (game.inventory.length > 0) {
+      const rummagingInventory = randomChoices(game.inventory, 3);
+      _choiceList.push({
+        buttonText: 'Let me rummage through our inventory...',
+        made: () => {
+          return {
+            gameState: {
+              followUpChoices: rummagingInventory.map((item) => {
+                return {
+                  buttonText: 'Do something with ' + item.name,
+                  made: () => {
+                    return {
+                      bluntConsumed: 0.05
+                    };
+                  }
+                };
+              })
+            },
+            bluntConsumed: 0.15,
+            choiceResultMessage: 'What do we have here?'
+          };
+        }
+      });
+
+      //putting random stuff in your mouth
       const randomToConsume = ROT.RNG.getItem(game.inventory);
       if (randomToConsume?.onConsume !== undefined) {
         _choiceList.push({
