@@ -10,38 +10,80 @@ import * as Comms from './comms';
 import * as Choices from './choices';
 import { filterInPlace, randomChoices } from './utils';
 
-// const cValRand = () => {
-//   const cMin = 5;
-//   const cMax = 120;
-//   return ROT.RNG.getUniformInt(cMin, cMax);
-// };
-
+// 3D SETUP =============================
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x8855aa);
 const camera = new THREE.PerspectiveCamera(
   75,
   ResponsiveApp.width / ResponsiveApp.height,
-  0.1,
-  1000
+  1,
+  13
 );
+camera.position.z = 1;
+camera.setRotationFromEuler(new THREE.Euler(Math.PI * 0.5, 0, 0));
+
 const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
+// const material = new THREE.MeshBasicMaterial({ color: 0x44aa88 });
+const material = new THREE.MeshDepthMaterial({ wireframe: false });
+
+//Cube Grid
+const levelObjects: THREE.Object3D[] = [];
+const innerRoom = 2;
+const outerWall = 5;
+function makeCubeAt(x: number, y: number, z: number) {
+  const cube = new THREE.Mesh(geometry, material);
+  cube.position.set(x, y, z);
+  scene.add(cube);
+  levelObjects.push(cube);
+}
+
+function createRandomLevel() {
+  for (let i = -outerWall; i <= outerWall; i++) {
+    for (let j = -outerWall; j <= outerWall; j++) {
+      //floor
+      makeCubeAt(i, j, -1);
+      //ceiling
+      makeCubeAt(i, j, 3);
+      if (Math.abs(i) <= innerRoom && Math.abs(j) <= innerRoom) {
+        continue;
+      }
+      if (
+        ROT.RNG.getUniform() < 0.3 ||
+        Math.abs(i) === outerWall ||
+        Math.abs(j) === outerWall
+      ) {
+        makeCubeAt(i, j, 0);
+        makeCubeAt(i, j, 1);
+        makeCubeAt(i, j, 2);
+      }
+    }
+  }
+}
 
 const animate = () => {
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
+  // cube.rotation.x += 0.01;
+  // cube.rotation.y += 0.01;
+  // camera.rotateY(-0.01);
 };
-scene.add(cube);
-scene.background = new THREE.Color(0x8855aa);
-
-camera.position.z = 5;
+// ============================
 
 function App() {
   const canvasRef = React.createRef<HTMLCanvasElement>();
-  // const [bgColors, setBGColors] = useState({
-  //   c1: ROT.Color.add([0, 0, 0]),
-  //   c2: ROT.Color.add([0, 0, 0])
-  // });
+
+  const [game, setGame] = useState<Game.GameState>(Game.Empty());
+  const [charInfo, setCharInfo] = useState<JSX.Element>(<span></span>);
+  const [choiceList, setChoiceList] = useState<Choices.Choice[]>([]);
+
+  const cValRand = () => {
+    const cMin = 5;
+    const cMax = 200;
+    return ROT.RNG.getUniformInt(cMin, cMax);
+  };
+  const [bgColors, setBGColors] = useState({
+    c1: ROT.Color.add([0, 0, 0]),
+    c2: ROT.Color.add([0, 0, 0]),
+    opacity: 1
+  });
   useEffect(() => {
     const canvas = canvasRef?.current;
     if (!canvas) {
@@ -53,10 +95,16 @@ function App() {
     }
 
     ctx.clearRect(0, 0, ResponsiveApp.width, ResponsiveApp.height);
-    // const arc = Math.abs(0.5 - game.quaternionIndex / game.party.length);
-    // const bgColor = ROT.Color.interpolate(bgColors.c1, bgColors.c2, arc);
-    // ctx.fillStyle = ROT.Color.toHex(bgColor);
-    // ctx.fillRect(0, 0, ResponsiveApp.width, ResponsiveApp.height);
+    const arc =
+      game.party.length > 0
+        ? Math.abs(0.5 - game.quaternionIndex / game.party.length)
+        : 0;
+    const bgColor = ROT.Color.interpolate(bgColors.c1, bgColors.c2, arc);
+    const fs =
+      ROT.Color.toHex(bgColor) +
+      (Math.floor(bgColors.opacity) * 255).toString(16).padStart(2, '0');
+    ctx.fillStyle = fs;
+    ctx.fillRect(0, 0, ResponsiveApp.width, ResponsiveApp.height);
 
     if (game.party.length > 0 && game.currentDungeonLevel % 1 === 0) {
       //visible characters around quaternion
@@ -82,13 +130,15 @@ function App() {
           top
         );
       }
+
+      const yawRadians =
+        (game.quaternionIndex / game.party.length) * 2 * Math.PI;
+      camera.setRotationFromEuler(
+        new THREE.Euler(Math.PI * 0.5, -yawRadians, 0)
+      );
     }
     //TODO: should use a deps list to ensure this re-renders properly
-  });
-
-  const [game, setGame] = useState<Game.GameState>(Game.Empty());
-  const [charInfo, setCharInfo] = useState<JSX.Element>(<span></span>);
-  const [choiceList, setChoiceList] = useState<Choices.Choice[]>([]);
+  }, [game]);
 
   //game updated
   useEffect(() => {
@@ -106,7 +156,7 @@ function App() {
   }, [game]);
 
   //rotation animation
-  const rotateRate = 0.1;
+  const rotateRate = 0.08;
   useEffect(() => {
     const interval = setInterval(() => {
       const phase = game.quaternionIndex % 1;
@@ -122,7 +172,8 @@ function App() {
           //keep rotating
           setGame({
             ...game,
-            quaternionIndex: (game.quaternionIndex + 0.1) % game.party.length
+            quaternionIndex:
+              (game.quaternionIndex + rotateRate) % game.party.length
           });
         }
       }
@@ -131,11 +182,19 @@ function App() {
   });
 
   const StartGame = useCallback(() => {
+    createRandomLevel();
+
+    setBGColors({
+      c1: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
+      c2: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
+      opacity: 0.3
+    });
+
     setGame(Game.Begin());
   }, [game, setGame]);
 
   const StartScreen: JSX.Element = (
-    <ResponsiveApp.Overlay>
+    <ResponsiveApp.Overlay style={{ backgroundColor: 'black' }}>
       <UI.Title>Blunt Quaternion</UI.Title>
       <UI.DelveButton onClick={StartGame}>Begin...</UI.DelveButton>
     </ResponsiveApp.Overlay>
@@ -195,10 +254,11 @@ function App() {
 
   const delveNext = useCallback(() => {
     //interm:
-    // setBGColors({
-    //   c1: ROT.Color.add([0, 0, 0]),
-    //   c2: ROT.Color.add([0, 0, 0])
-    // });
+    setBGColors({
+      c1: ROT.Color.add([0, 0, 0]),
+      c2: ROT.Color.add([0, 0, 0]),
+      opacity: 0
+    });
     setGame({
       ...game,
       currentDungeonLevel: game.currentDungeonLevel + 0.1
@@ -241,10 +301,12 @@ function App() {
     );
 
     setTimeout(() => {
-      // setBGColors({
-      //   c1: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
-      //   c2: ROT.Color.add([cValRand(), cValRand(), cValRand()])
-      // });
+      createRandomLevel();
+      setBGColors({
+        c1: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
+        c2: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
+        opacity: 0.3
+      });
 
       //add to party from this level
       const locals = [
@@ -320,7 +382,9 @@ function App() {
   );
 
   const DelvingScreen: JSX.Element = (
-    <UI.DungeonLevelTitle>Delving...</UI.DungeonLevelTitle>
+    <ResponsiveApp.Overlay style={{ backgroundColor: 'black' }}>
+      <UI.DungeonLevelTitle>Delving...</UI.DungeonLevelTitle>
+    </ResponsiveApp.Overlay>
   );
 
   const WinScreen: JSX.Element = (
