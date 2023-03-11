@@ -6,7 +6,7 @@ import { GameState } from '../game';
 import * as World from '../world';
 
 export interface ChoiceResult {
-  gameState: GameState;
+  gameState?: GameState;
   bluntConsumed: number;
   choiceResultMessage?: string;
 }

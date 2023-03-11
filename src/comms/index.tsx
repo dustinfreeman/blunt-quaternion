@@ -3,15 +3,16 @@ import styled from 'styled-components';
 // import * as ResponsiveApp from '../ResponsiveApp';
 
 // Credit: https://opengameart.org/content/comic-speech-balloons
-import ImgThoughtBubble from './comic-1.png';
+import ImgThoughtBubble from './comic-3.png';
 
 const CommsBubble = styled.div({
-  width: 100,
+  width: 130,
+  height: 80,
   opacity: 0.6,
   position: 'absolute',
-  left: 30,
-  // backgroundColor: 'orange',
-  height: 100
+  // backgroundColor: '#00a4',
+  left: 3,
+  top: 30
 });
 
 const CommsBubbleImg = styled.img({
@@ -21,11 +22,16 @@ const CommsBubbleImg = styled.img({
 });
 
 const CommsText = styled.div({
-  width: '70%',
   textAlign: 'center',
-  height: '100%',
-  margin: '15%',
+  verticalAlign: 'center',
   position: 'absolute',
+  marginTop: '9%',
+  marginBottom: '10%',
+  height: 'auto',
+  marginLeft: '10%',
+  marginRight: '14%',
+  width: '76%',
+  // backgroundColor: '#f006',
   fontSize: 8
 });
 

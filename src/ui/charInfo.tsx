@@ -7,9 +7,9 @@ const CharInfoArea = styled.div({
   backgroundColor: '#0005',
   position: 'absolute',
   textAlign: 'left',
-  width: '70px',
-  top: ResponsiveApp.height / 2,
-  left: 30
+  width: 90,
+  top: ResponsiveApp.height / 2 + 20,
+  left: 20
 });
 const CharInfoLine = styled.div({
   fontSize: '8px',

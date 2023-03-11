@@ -36,15 +36,29 @@ export const Empty = (): GameState => {
   };
 };
 
+const SurfaceTutorialGuide: FormCharacter = {
+  name: 'Scholar of the M.o.M.',
+  role: 'Archeologist',
+  level: 10,
+  species: 'gnome',
+  relationship: 'Local Guide',
+  extraChoices: [
+    {
+      buttonText: 'Let me tell you about your quest.',
+      made: () => {
+        return {
+          bluntConsumed: 0.03,
+          choiceResultMessage:
+            'Your Quest: Delve to the bottom of the Mazes of Menace, retrieve the Amulet of Yendor, and then ascend.'
+        };
+      }
+    }
+  ]
+};
+
 export const Begin = (): GameState => {
   const party: FormCharacter[] = [
-    {
-      name: 'Scholar of the M.o.M.',
-      role: 'Archeologist',
-      level: 10,
-      species: 'gnome',
-      relationship: 'Local Guide'
-    },
+    SurfaceTutorialGuide,
     {
       // https://nethackwiki.com/wiki/Player
       name: 'You',
