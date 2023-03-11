@@ -9,63 +9,7 @@ import * as World from './world';
 import * as Comms from './comms';
 import * as Choices from './choices';
 import { filterInPlace, randomChoices } from './utils';
-
-// 3D SETUP =============================
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x8855aa);
-const camera = new THREE.PerspectiveCamera(
-  75,
-  ResponsiveApp.width / ResponsiveApp.height,
-  1,
-  13
-);
-camera.position.z = 1;
-camera.setRotationFromEuler(new THREE.Euler(Math.PI * 0.5, 0, 0));
-
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-// const material = new THREE.MeshBasicMaterial({ color: 0x44aa88 });
-const material = new THREE.MeshDepthMaterial({ wireframe: false });
-
-//Cube Grid
-const levelObjects: THREE.Object3D[] = [];
-const innerRoom = 2;
-const outerWall = 5;
-function makeCubeAt(x: number, y: number, z: number) {
-  const cube = new THREE.Mesh(geometry, material);
-  cube.position.set(x, y, z);
-  scene.add(cube);
-  levelObjects.push(cube);
-}
-
-function createRandomLevel() {
-  for (let i = -outerWall; i <= outerWall; i++) {
-    for (let j = -outerWall; j <= outerWall; j++) {
-      //floor
-      makeCubeAt(i, j, -1);
-      //ceiling
-      makeCubeAt(i, j, 3);
-      if (Math.abs(i) <= innerRoom && Math.abs(j) <= innerRoom) {
-        continue;
-      }
-      if (
-        ROT.RNG.getUniform() < 0.3 ||
-        Math.abs(i) === outerWall ||
-        Math.abs(j) === outerWall
-      ) {
-        makeCubeAt(i, j, 0);
-        makeCubeAt(i, j, 1);
-        makeCubeAt(i, j, 2);
-      }
-    }
-  }
-}
-
-const animate = () => {
-  // cube.rotation.x += 0.01;
-  // cube.rotation.y += 0.01;
-  // camera.rotateY(-0.01);
-};
-// ============================
+import { scene, camera, createRandomLevel, animate } from './thirdDimension';
 
 function App() {
   const canvasRef = React.createRef<HTMLCanvasElement>();
@@ -199,13 +143,6 @@ function App() {
       <UI.DelveButton onClick={StartGame}>Begin...</UI.DelveButton>
     </ResponsiveApp.Overlay>
   );
-
-  //HACK: game start
-  // useEffect(() => {
-  //   if (game.party.length === 0) {
-  //     StartGame();
-  //   }
-  // });
 
   function refreshChoices() {
     const char = game.party[game.quaternionIndex];
@@ -443,16 +380,6 @@ function App() {
       animate={animate}>
       {game.currentDungeonLevel < 0 && StartScreen}
       {game.currentDungeonLevel >= 0 && PlayingScreen}
-      {/* {
-          <ResponsiveApp.Overlay>
-            <UI._BaseButton
-              onClick={() => {
-                game.party.forEach((c) => c.hp.update(-1000));
-              }}>
-              Kill Party
-            </UI._BaseButton>
-          </ResponsiveApp.Overlay>
-        } */}
       {showHelp && (
         <ResponsiveApp.Overlay style={{ backgroundColor: 'darkslateblue' }}>
           <UI.Title>Help?</UI.Title>
