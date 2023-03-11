@@ -10,78 +10,53 @@ import * as Comms from './comms';
 import * as Choices from './choices';
 import { filterInPlace, randomChoices } from './utils';
 
-const cValRand = () => {
-  const cMin = 5;
-  const cMax = 120;
-  return ROT.RNG.getUniformInt(cMin, cMax);
-};
+// const cValRand = () => {
+//   const cMin = 5;
+//   const cMax = 120;
+//   return ROT.RNG.getUniformInt(cMin, cMax);
+// };
 
-let threeCanvas: HTMLCanvasElement | undefined = undefined;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(
+  75,
+  ResponsiveApp.width / ResponsiveApp.height,
+  0.1,
+  1000
+);
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const cube = new THREE.Mesh(geometry, material);
+
+const animate = () => {
+  cube.rotation.x += 0.01;
+  cube.rotation.y += 0.01;
+};
+scene.add(cube);
+scene.background = new THREE.Color(0x8855aa);
+
+camera.position.z = 5;
 
 function App() {
   const canvasRef = React.createRef<HTMLCanvasElement>();
-  const threeCanvasMountPoint = React.createRef<HTMLDivElement>();
-
-  //"run once"
-  useEffect(() => {
-    //want to prevent re-run if the scene has already been added to the DOM...
-    if (threeCanvas) {
-      return;
-    }
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      ResponsiveApp.width / ResponsiveApp.height,
-      0.1,
-      1000
-    );
-
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(ResponsiveApp.width, ResponsiveApp.height);
-    threeCanvas = renderer.domElement;
-    threeCanvasMountPoint.current?.appendChild(threeCanvas);
-    console.log('mounted!', threeCanvas);
-
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
-    scene.background = new THREE.Color(0xffbbaa);
-
-    camera.position.z = 5;
-
-    function animate() {
-      requestAnimationFrame(animate);
-
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
-
-      renderer.render(scene, camera);
-    }
-
-    animate();
-  }, [threeCanvasMountPoint]);
-  // ======================================================
-
-  const [bgColors, setBGColors] = useState({
-    c1: ROT.Color.add([0, 0, 0]),
-    c2: ROT.Color.add([0, 0, 0])
-  });
+  // const [bgColors, setBGColors] = useState({
+  //   c1: ROT.Color.add([0, 0, 0]),
+  //   c2: ROT.Color.add([0, 0, 0])
+  // });
   useEffect(() => {
     const canvas = canvasRef?.current;
     if (!canvas) {
       return;
     }
-    const ctx = canvas.getContext('2d'); //, { alpha: false });
+    const ctx = canvas.getContext('2d');
     if (!ctx) {
       return;
     }
 
-    const arc = Math.abs(0.5 - game.quaternionIndex / game.party.length);
-    const bgColor = ROT.Color.interpolate(bgColors.c1, bgColors.c2, arc);
-    ctx.fillStyle = ROT.Color.toHex(bgColor);
-    ctx.fillRect(0, 0, ResponsiveApp.width, ResponsiveApp.height);
+    ctx.clearRect(0, 0, ResponsiveApp.width, ResponsiveApp.height);
+    // const arc = Math.abs(0.5 - game.quaternionIndex / game.party.length);
+    // const bgColor = ROT.Color.interpolate(bgColors.c1, bgColors.c2, arc);
+    // ctx.fillStyle = ROT.Color.toHex(bgColor);
+    // ctx.fillRect(0, 0, ResponsiveApp.width, ResponsiveApp.height);
 
     if (game.party.length > 0 && game.currentDungeonLevel % 1 === 0) {
       //visible characters around quaternion
@@ -220,10 +195,10 @@ function App() {
 
   const delveNext = useCallback(() => {
     //interm:
-    setBGColors({
-      c1: ROT.Color.add([0, 0, 0]),
-      c2: ROT.Color.add([0, 0, 0])
-    });
+    // setBGColors({
+    //   c1: ROT.Color.add([0, 0, 0]),
+    //   c2: ROT.Color.add([0, 0, 0])
+    // });
     setGame({
       ...game,
       currentDungeonLevel: game.currentDungeonLevel + 0.1
@@ -266,10 +241,10 @@ function App() {
     );
 
     setTimeout(() => {
-      setBGColors({
-        c1: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
-        c2: ROT.Color.add([cValRand(), cValRand(), cValRand()])
-      });
+      // setBGColors({
+      //   c1: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
+      //   c2: ROT.Color.add([cValRand(), cValRand(), cValRand()])
+      // });
 
       //add to party from this level
       const locals = [
@@ -397,11 +372,14 @@ function App() {
   const [showHelp, setShowHelp] = useState(false);
 
   return (
-    <ResponsiveApp.RootDiv canvasRef={canvasRef}>
-      <ResponsiveApp.Overlay ref={threeCanvasMountPoint}>
-        {game.currentDungeonLevel < 0 && StartScreen}
-        {game.currentDungeonLevel >= 0 && PlayingScreen}
-        {/* {
+    <ResponsiveApp.RootDivWithThree
+      canvasRef={canvasRef}
+      scene={scene}
+      camera={camera}
+      animate={animate}>
+      {game.currentDungeonLevel < 0 && StartScreen}
+      {game.currentDungeonLevel >= 0 && PlayingScreen}
+      {/* {
           <ResponsiveApp.Overlay>
             <UI._BaseButton
               onClick={() => {
@@ -411,26 +389,25 @@ function App() {
             </UI._BaseButton>
           </ResponsiveApp.Overlay>
         } */}
-        {showHelp && (
-          <ResponsiveApp.Overlay style={{ backgroundColor: 'darkslateblue' }}>
-            <UI.Title>Help?</UI.Title>
-            <UI._BaseButton
-              onClick={() => {
-                setShowHelp(false);
-                restartGame();
-              }}>
-              Restart Game
-            </UI._BaseButton>
-          </ResponsiveApp.Overlay>
-        )}
-        <UI.HelpButton
-          onClick={() => {
-            setShowHelp(!showHelp);
-          }}>
-          {'_?_'}
-        </UI.HelpButton>
-      </ResponsiveApp.Overlay>
-    </ResponsiveApp.RootDiv>
+      {showHelp && (
+        <ResponsiveApp.Overlay style={{ backgroundColor: 'darkslateblue' }}>
+          <UI.Title>Help?</UI.Title>
+          <UI._BaseButton
+            onClick={() => {
+              setShowHelp(false);
+              restartGame();
+            }}>
+            Restart Game
+          </UI._BaseButton>
+        </ResponsiveApp.Overlay>
+      )}
+      <UI.HelpButton
+        onClick={() => {
+          setShowHelp(!showHelp);
+        }}>
+        {'_?_'}
+      </UI.HelpButton>
+    </ResponsiveApp.RootDivWithThree>
   );
 }
 
