@@ -1,36 +1,54 @@
+import * as ROT from 'rot-js';
+import { Character, PlayerSpeciesList } from './characters';
+
 // https://nethackwiki.com/wiki/Item
-
-import { Character } from './characters';
-
 type ItemType = 'comestible' | 'ring' | 'potion' | 'quest';
 
 export interface Item {
   name: string;
   itemType: ItemType;
-  onEat?: (c: Character) => void;
+  onConsume?: (c: Character) => string | void;
 }
+
+export const ConsumeVerb = (item: Item) => {
+  switch (item.itemType) {
+    case 'potion':
+      return 'quaff';
+    default:
+      return 'eat';
+  }
+};
 
 export const LootList: Item[] = [
   // https://nethackwiki.com/wiki/Comestible
   {
     name: 'food ration',
     itemType: 'comestible',
-    onEat: (c) => {
+    onConsume: (c) => {
       c.hp.update(8);
     }
   },
   {
     name: 'tin on spinach',
     itemType: 'comestible',
-    onEat: (c) => {
+    onConsume: (c) => {
       c.hp.update(4);
     }
   },
   {
     name: 'egg',
     itemType: 'comestible',
-    onEat: (c) => {
+    onConsume: (c) => {
       c.hp.update(1);
+    }
+  },
+  {
+    name: 'Potion of polymorph',
+    itemType: 'potion',
+    onConsume: (c) => {
+      const newSpecies = ROT.RNG.getItem(PlayerSpeciesList) as string;
+      c.species = newSpecies;
+      return 'I polymorphed myself into a ' + newSpecies;
     }
   }
 ];

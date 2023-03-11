@@ -2,9 +2,9 @@ import * as ROT from 'rot-js';
 
 import { Choice } from '.';
 import { GameState } from '../game';
-import { Character } from '../world';
+import * as World from '../world';
 
-export function ChoicesFor(char: Character, game: GameState): Choice[] {
+export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
   const _choiceList: Choice[] = [
     {
       buttonText: 'Think Deeply...',
@@ -60,19 +60,25 @@ export function ChoicesFor(char: Character, game: GameState): Choice[] {
 
   if (char.relationship === 'Party Member') {
     if (game.inventory.length > 0) {
-      const randomToEat = ROT.RNG.getItem(game.inventory);
-      if (randomToEat?.onEat !== undefined) {
+      const randomToConsume = ROT.RNG.getItem(game.inventory);
+      if (randomToConsume?.onConsume !== undefined) {
         _choiceList.push({
-          buttonText: "I'm going to eat this " + randomToEat.name,
+          buttonText:
+            "I'm going to " +
+            World.ConsumeVerb(randomToConsume) +
+            ' this ' +
+            randomToConsume.name,
           made: (game) => {
-            randomToEat.onEat?.(char);
+            const onConsumeMessage = randomToConsume.onConsume?.(char);
             return {
               gameState: {
                 ...game,
-                inventory: game.inventory.filter((item) => item !== randomToEat)
+                inventory: game.inventory.filter(
+                  (item) => item !== randomToConsume
+                )
               },
               bluntConsumed: 0.1,
-              choiceResultMessage: 'yum!'
+              choiceResultMessage: onConsumeMessage ?? 'yum!'
             };
           }
         });
