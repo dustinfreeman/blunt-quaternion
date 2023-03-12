@@ -2,7 +2,7 @@ import * as ROT from 'rot-js';
 import { Character, PlayerSpeciesList } from './characters';
 
 // https://nethackwiki.com/wiki/Item
-type ItemType = 'comestible' | 'ring' | 'potion' | 'quest';
+type ItemType = 'comestible' | 'potion' | 'ring' | 'quest';
 
 export interface Item {
   name: string;

@@ -90,7 +90,10 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
       });
 
       //putting random stuff in your mouth
-      const randomToConsume = ROT.RNG.getItem(game.inventory);
+      const consumables = game.inventory.filter((item) =>
+        ['comestible', 'potion'].includes(item.itemType)
+      );
+      const randomToConsume = ROT.RNG.getItem(consumables);
       if (randomToConsume?.onConsume !== undefined) {
         _choiceList.push({
           buttonText:
@@ -113,6 +116,44 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
         });
       }
     }
+
+    if (char.ringFinger === undefined) {
+      const wearables = game.inventory.filter((item) =>
+        ['ring'].includes(item.itemType)
+      );
+      const randomWearable = ROT.RNG.getItem(wearables);
+      if (randomWearable) {
+        _choiceList.push({
+          buttonText: "I'm going to put on this " + randomWearable.name,
+          made: (game) => {
+            char.ringFinger = randomWearable;
+            return {
+              gameState: {
+                inventory: game.inventory.filter(
+                  (item) => item !== randomWearable
+                )
+              },
+              bluntConsumed: 0.1,
+              choiceResultMessage: 'shiny!'
+            };
+          }
+        });
+      }
+    } else {
+      _choiceList.push({
+        buttonText: "I'm going to take off this " + char.ringFinger.name,
+        made: (game) => {
+          game.inventory.push(char.ringFinger!);
+          char.ringFinger = undefined;
+          return {
+            bluntConsumed: 0.1,
+            choiceResultMessage: 'it was ugly anyway'
+          };
+        }
+      });
+    }
+
+    //TACTICS
     if (char.tactics.aggression < 1) {
       _choiceList.push({
         buttonText: 'I should be more aggressive.',
