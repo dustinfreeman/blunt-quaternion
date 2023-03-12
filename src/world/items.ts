@@ -30,7 +30,7 @@ export const LootList: Item[] = [
     }
   },
   {
-    name: 'tin on spinach',
+    name: 'tin of spinach',
     itemType: 'comestible',
     onConsume: (c) => {
       c.hp.update(4);

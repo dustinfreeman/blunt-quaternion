@@ -229,10 +229,10 @@ function App() {
       party.forEach((c: World.Character) => {
         const wearingRingOfConflict = c.ringFinger?.name === 'ring of conflict';
         const combatIncidence =
-          (c.tactics.aggression + 0.25) *
+          (c.tactics.aggression + 0.5) *
           (game.currentDungeonLevel + 1) *
           (wearingRingOfConflict ? 2 : 1) *
-          (ROT.RNG.getUniform() + 0.5) *
+          (ROT.RNG.getUniform() + 1.5) *
           game.delveSimulation.combatMultiplier;
 
         //how much damage you took
@@ -242,7 +242,7 @@ function App() {
         c.hp.update(
           Math.round(
             ROT.RNG.getUniform() *
-              -3 *
+              -5 *
               combatIncidence *
               (wearingRingOfWarning ? 0.5 : 1)
           )
@@ -255,13 +255,25 @@ function App() {
         if (c.role && ['Valkyrie', 'Wizard'].includes(c.role)) {
           wisdomScaling *= 2 * ((c.attributes.WIS.val() - 10) / 10) + 1;
         }
+
+        console.log(
+          'Simulations',
+          game.delveSimulation,
+          c.name,
+          c.species,
+          c.role,
+          'combatIncidence',
+          combatIncidence
+        );
+
         World.addXP(
           c,
           Math.round(combatIncidence * 16 * strengthScaling * wisdomScaling)
         );
       });
     };
-    if (!game.delveSimulation.elberethed || ROT.RNG.getUniform() < 0.2) {
+
+    if (!game.delveSimulation.elberethed || ROT.RNG.getUniform() < 0.3) {
       simulateCombat();
     }
     //Remove dead party members
