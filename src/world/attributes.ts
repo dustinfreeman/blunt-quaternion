@@ -15,17 +15,6 @@ export class Attribute {
   }
 }
 
-// const getAttrVal = (attrBlock: Attributes, attrName: string): number => {
-//   switch (attrName) {
-//     case 'STR':
-//       return attrBlock.STR;
-//     case 'WIS':
-//       return attrBlock.STR;
-//     default:
-//       return 0;
-//   }
-// };
-
 export interface AttrBlock {
   // https://nethackwiki.com/wiki/Attribute
   STR: Attribute;
