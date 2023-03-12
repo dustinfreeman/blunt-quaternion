@@ -4,6 +4,7 @@ import { Choice } from '.';
 import { GameState } from '../game';
 import { randomChoices } from '../utils';
 import * as World from '../world';
+import { Species } from '../world';
 
 export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
   const _choiceList: Choice[] = [
@@ -140,6 +141,46 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
           return {
             bluntConsumed: 0.3,
             choiceResultMessage: 'I will try to get into less confrontations.'
+          };
+        }
+      });
+    }
+
+    if (char.name === 'You' && !game.elberethed) {
+      _choiceList.push({
+        buttonText: 'Let me tell you of the beauty of Elbereth, man',
+        made: () => {
+          return {
+            gameState: { elberethed: true },
+            bluntConsumed: 0.5,
+            choiceResultMessage:
+              'I have asked Elbereth to protect us this coming delve'
+          };
+        }
+      });
+    }
+
+    const SpeciesBarks = new Map<Species, string>([
+      ['dog', 'Woof!'],
+      ['cat', 'Meow!'],
+      ['pony', 'Stomp!']
+    ]);
+    const barkable = SpeciesBarks.get(char.species);
+    if (barkable) {
+      _choiceList.push({
+        buttonText: barkable,
+        made: (game) => {
+          const char = game.party[game.quaternionIndex];
+
+          //exercising
+          const choiceMessage =
+            barkable +
+            (char.attributes.STR.exercise(0.3)
+              ? ' (my strength increased!)'
+              : '');
+          return {
+            bluntConsumed: 0.05,
+            choiceResultMessage: choiceMessage
           };
         }
       });

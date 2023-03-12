@@ -77,48 +77,7 @@ export function Display(c: Character): { char: string } {
 
 export function FleshOut(chars: FormCharacter[]): Character[] {
   return chars.map((c) => {
-    //EXTRA CHOICES
     const charChoices: Choice[] = [];
-    const SpeciesBarks = new Map<Species, string>([
-      ['dog', 'Woof!'],
-      ['cat', 'Meow!'],
-      ['pony', 'Stomp!']
-    ]);
-    const barkable = SpeciesBarks.get(c.species);
-    if (barkable) {
-      charChoices.push({
-        buttonText: barkable,
-        made: (game) => {
-          const char = game.party[game.quaternionIndex];
-
-          //exercising
-          const choiceMessage =
-            barkable +
-            (char.attributes.STR.exercise(0.3)
-              ? ' (my strength increased!)'
-              : '');
-          return {
-            bluntConsumed: 0.05,
-            choiceResultMessage: choiceMessage
-          };
-        }
-      });
-    }
-
-    if (c.name === 'You') {
-      charChoices.push({
-        buttonText: 'Let me tell you of the beauty of Elbereth, man',
-        made: () => {
-          return {
-            gameState: { elberethed: true },
-            bluntConsumed: 0.5,
-            choiceResultMessage:
-              'I have asked Elbereth to protect us this delve'
-          };
-        }
-      });
-    }
-
     return {
       //defaults first...
       role: undefined,
