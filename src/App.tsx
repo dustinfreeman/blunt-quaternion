@@ -215,17 +215,19 @@ function App() {
 
     //Combat Simulation
     const simulateCombat = () => {
-      //TODO: assemble total combat power.
+      //TODO: assemble total combat power, instead of per-party member
       party.forEach((c: World.Character) => {
+        const wearingRingOfConflict = c.ringFinger?.name === 'ring of conflict';
         const combatIncidence =
           (c.tactics.aggression + 0.25) *
           (game.currentDungeonLevel + 1) *
-          ROT.RNG.getUniform();
+          (wearingRingOfConflict ? 2 : 1) *
+          (ROT.RNG.getUniform() + 0.2);
 
         //how much damage you took
         // wearing a ring of warning perhaps means you were able to
         // avoid combats you wouldn't do well in.
-        const wearingRingOfWarning = c.ringFinger?.name === 'ring of Warning';
+        const wearingRingOfWarning = c.ringFinger?.name === 'ring of warning';
         c.hp.update(
           Math.round(
             ROT.RNG.getUniform() *

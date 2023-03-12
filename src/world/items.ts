@@ -55,5 +55,10 @@ export const LootList: Item[] = [
     //https://nethackwiki.com/wiki/Ring_of_warning
     name: 'ring of warning',
     itemType: 'ring'
+  },
+  {
+    //https://nethackwiki.com/wiki/Ring_of_conflict
+    name: 'ring of conflict',
+    itemType: 'ring'
   }
 ];
