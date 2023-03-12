@@ -145,7 +145,7 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
     //TACTICS
     if (char.tactics.aggression < 1) {
       _choiceList.push({
-        buttonText: 'I should be more aggressive.',
+        buttonText: 'Tactics: I should be more aggressive.',
         made: () => {
           char.tactics.aggression = ROT.Util.clamp(
             char.tactics.aggression + 0.25,
@@ -161,7 +161,7 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
     }
     if (char.tactics.aggression > 0) {
       _choiceList.push({
-        buttonText: 'I should be less aggressive.',
+        buttonText: 'Tactics: I should be less aggressive.',
         made: () => {
           char.tactics.aggression = ROT.Util.clamp(
             char.tactics.aggression - 0.25,

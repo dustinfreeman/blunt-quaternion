@@ -247,10 +247,11 @@ function App() {
         );
 
         //how much good combats you completed
-        const strengthScaling = 2 * ((c.attributes.STR.val() - 10) / 10);
+        // https://nethackwiki.com/wiki/Strength#Uses_of_strength
+        const strengthScaling = 2 * ((c.attributes.STR.val() - 10) / 10) + 1;
         let wisdomScaling = 1;
         if (c.role && ['Valkyrie', 'Wizard'].includes(c.role)) {
-          wisdomScaling *= 2 * ((c.attributes.WIS.val() - 10) / 10);
+          wisdomScaling *= 2 * ((c.attributes.WIS.val() - 10) / 10) + 1;
         }
         World.addXP(
           c,
