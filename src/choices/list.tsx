@@ -4,6 +4,7 @@ import { Choice } from '.';
 import { GameState } from '../game';
 import { randomChoices } from '../utils';
 import * as World from '../world';
+import { ResidentChoices } from './residents';
 
 export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
   const _choiceList: Choice[] = [
@@ -176,12 +177,14 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
       });
     }
 
-    if (char.name === 'You' && !game.elberethed) {
+    if (char.name === 'You' && !game.delveSimulation.elberethed) {
       _choiceList.push({
         buttonText: 'Let me tell you of the beauty of Elbereth, man',
-        made: () => {
+        made: (game) => {
           return {
-            gameState: { elberethed: true },
+            gameState: {
+              delveSimulation: { ...game.delveSimulation, elberethed: true }
+            },
             bluntConsumed: 0.5,
             choiceResultMessage:
               'I have asked Elbereth to protect us for the next delve'
@@ -217,6 +220,10 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
     }
   }
   _choiceList.push(...char.extraChoices);
+
+  if (char.relationship === 'Resident') {
+    _choiceList.push(...ResidentChoices(char, game));
+  }
 
   return _choiceList;
 }

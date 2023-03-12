@@ -13,13 +13,22 @@ import {
 import * as Choices from './choices';
 import { Meter } from './utils';
 
+interface DelveSimulation {
+  lootMultiplier: number;
+  combatMultiplier: number;
+  elberethed: boolean;
+}
+export const DelveSimulationDefaults = (): DelveSimulation => {
+  return { lootMultiplier: 1, combatMultiplier: 1, elberethed: false };
+};
+
 export interface GameState {
   party: Character[];
   graveyard: Character[];
   inventory: Item[];
   currentDungeonLevel: number;
   delveDirection: number;
-  elberethed: boolean;
+  delveSimulation: DelveSimulation;
   //current quaternion:
   quaternionIndex: number;
   bluntFraction: number;
@@ -34,7 +43,7 @@ export const Empty = (): GameState => {
     inventory: [],
     currentDungeonLevel: -1,
     delveDirection: 1,
-    elberethed: false,
+    delveSimulation: DelveSimulationDefaults(),
     quaternionIndex: 0,
     bluntFraction: 0,
     lastChoiceResult: '',
@@ -118,7 +127,7 @@ export const Begin = (): GameState => {
     inventory: [],
     currentDungeonLevel: 0,
     delveDirection: 1,
-    elberethed: false,
+    delveSimulation: DelveSimulationDefaults(),
     quaternionIndex: 0,
     bluntFraction: 1,
     lastChoiceResult: '',

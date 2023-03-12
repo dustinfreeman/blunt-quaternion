@@ -218,7 +218,8 @@ function App() {
     inventory.push(
       ...randomChoices(
         World.LootList,
-        2 + (someoneWearingRingOfSearching ? 2 : 0)
+        (2 + (someoneWearingRingOfSearching ? 2 : 0)) *
+          game.delveSimulation.lootMultiplier
       )
     );
 
@@ -231,7 +232,8 @@ function App() {
           (c.tactics.aggression + 0.25) *
           (game.currentDungeonLevel + 1) *
           (wearingRingOfConflict ? 2 : 1) *
-          (ROT.RNG.getUniform() + 0.5);
+          (ROT.RNG.getUniform() + 0.5) *
+          game.delveSimulation.combatMultiplier;
 
         //how much damage you took
         // wearing a ring of warning perhaps means you were able to
@@ -259,7 +261,7 @@ function App() {
         );
       });
     };
-    if (!game.elberethed || ROT.RNG.getUniform() < 0.2) {
+    if (!game.delveSimulation.elberethed || ROT.RNG.getUniform() < 0.2) {
       simulateCombat();
     }
     //Remove dead party members
@@ -314,10 +316,10 @@ function App() {
         //reset quaternion for next blaze
         quaternionIndex: ROT.RNG.getUniformInt(0, game.party.length - 1),
         bluntFraction: 1,
-        lastChoiceResult: game.elberethed
+        lastChoiceResult: game.delveSimulation.elberethed
           ? 'Thank Elbereth for protecting us'
           : '',
-        elberethed: false
+        delveSimulation: Game.DelveSimulationDefaults()
       });
     }, 500);
   }, [game, setGame]);
