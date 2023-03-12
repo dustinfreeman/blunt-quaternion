@@ -1,6 +1,6 @@
 import { Choice } from '../choices/ui';
 import { Meter } from '../utils';
-import { AttrBlock, AttrsDefault } from './attributes';
+import { Item, AttrBlock, AttrsDefault } from '.';
 
 // https://nethackwiki.com/wiki/Role
 // https://nethackwiki.com/wiki/Role_difficulty#Role_difficulty_statistics
@@ -37,6 +37,7 @@ export interface Character {
   hp: Meter;
   attributes: AttrBlock;
   relationship: Relationship;
+  ringFinger: Item | undefined;
   tactics: {
     aggression: number;
     // looting: number;
@@ -125,6 +126,7 @@ export function FleshOut(chars: FormCharacter[]): Character[] {
       attributes: AttrsDefault(),
       //HACK:  https://nethackwiki.com/wiki/Hit_points#Hit_points_gained_on_level_gain_and_starting_hitpoints
       hp: new Meter(c.level * 4),
+      ringFinger: undefined,
       tactics: { aggression: 0.2, looting: 0.2 },
       extraChoices: charChoices,
       //then the form object...

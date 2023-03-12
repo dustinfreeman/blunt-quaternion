@@ -223,8 +223,19 @@ function App() {
           ROT.RNG.getUniform();
 
         //how much damage you took
-        c.hp.update(Math.round(ROT.RNG.getUniform() * -3 * combatIncidence));
-        //how much good you did
+        // wearing a ring of warning perhaps means you were able to
+        // avoid combats you wouldn't do well in.
+        const wearingRingOfWarning = c.ringFinger?.name === 'ring of Warning';
+        c.hp.update(
+          Math.round(
+            ROT.RNG.getUniform() *
+              -3 *
+              combatIncidence *
+              (wearingRingOfWarning ? 0.5 : 1)
+          )
+        );
+
+        //how much good combats you completed
         const strengthScaling = 2 * ((c.attributes.STR.val() - 10) / 10);
         let wisdomScaling = 1;
         if (c.role && ['Valkyrie', 'Wizard'].includes(c.role)) {

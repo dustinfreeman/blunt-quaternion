@@ -50,5 +50,10 @@ export const LootList: Item[] = [
       c.species = newSpecies;
       return 'I polymorphed myself into a ' + newSpecies;
     }
+  },
+  {
+    //https://nethackwiki.com/wiki/Ring_of_warning
+    name: 'ring of warning',
+    itemType: 'ring'
   }
 ];
