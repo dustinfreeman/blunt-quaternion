@@ -87,7 +87,7 @@ function App() {
   //game updated
   useEffect(() => {
     if (game.quaternionIndex % 1 === 0) {
-      console.log('current: ', game);
+      console.log('game state: ', game);
     }
     if (!partyIsDead()) {
       //playing
