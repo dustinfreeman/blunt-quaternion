@@ -58,9 +58,8 @@ export const MazesOfMenace: DungeonLevel[] = [
         extraChoices: [
           {
             buttonText: 'Allow me to provide you a consultation',
-            made: (game) => {
+            made: () => {
               return {
-                gameState: game,
                 bluntConsumed: 0.2,
                 // https://nethackwiki.com/wiki/Source:NetHack_3.6.1/dat/oracles.txt
                 choiceResultMessage:
@@ -76,7 +75,17 @@ export const MazesOfMenace: DungeonLevel[] = [
     ]
   },
   { name: "Mine's End" }, // https://nethackwiki.com/wiki/Mines%27_End
-  { name: 'Fort Ludios' }
+  {
+    name: 'Fort Ludios',
+    characters: [
+      {
+        // https://nethackwiki.com/wiki/Mastodon
+        species: 'mastodon',
+        relationship: 'Resident',
+        level: 20
+      }
+    ]
+  }
 ];
 
 const AmuletOfYendor: Item = {
@@ -92,11 +101,8 @@ const GivingAmuletOfYendor: Choice = {
     return !alreadyHaveAmulet;
   },
   made: (game) => {
+    game.inventory.push(AmuletOfYendor);
     return {
-      gameState: {
-        ...game,
-        inventory: [...game.inventory, AmuletOfYendor]
-      },
       bluntConsumed: 0.1,
       choiceResultMessage:
         'Congratulations, you feel you should get out of here...'

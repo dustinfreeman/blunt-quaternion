@@ -1,23 +1,26 @@
 import { Choice } from '../choices/ui';
 import { Meter } from '../utils';
+import { Item, AttrBlock, AttrsDefault } from '.';
 
 // https://nethackwiki.com/wiki/Role
 // https://nethackwiki.com/wiki/Role_difficulty#Role_difficulty_statistics
-export const Roles = [undefined, 'Ranger', 'Rogue', 'Valkyrie', 'Archeologist'];
+export const Roles = [
+  undefined,
+  'Ranger',
+  'Rogue',
+  'Valkyrie',
+  'Archeologist',
+  'Wizard'
+];
 export type Role = (typeof Roles)[number];
 
 // https://nethackwiki.com/wiki/Race
 export const PlayerSpeciesList = ['human', 'dwarf', 'elf', 'gnome', 'orc'];
 // https://nethackwiki.com/wiki/Pet
 export const Pets = ['dog', 'cat', 'pony'];
-export const Monsters = ['owlbear'];
+export const Monsters = ['owlbear', 'mastodon'];
 const SpeciesList = [undefined, ...PlayerSpeciesList, ...Pets, ...Monsters];
 export type Species = (typeof SpeciesList)[number];
-
-interface Attributes {
-  // https://nethackwiki.com/wiki/Attribute
-  STR: number;
-}
 
 type Relationship =
   | 'Party Member'
@@ -32,8 +35,9 @@ export interface Character {
   role: Role;
   level: number;
   hp: Meter;
-  attributes: Attributes;
+  attributes: AttrBlock;
   relationship: Relationship;
+  ringFinger: Item | undefined;
   tactics: {
     aggression: number;
     // looting: number;
@@ -73,53 +77,15 @@ export function Display(c: Character): { char: string } {
 
 export function FleshOut(chars: FormCharacter[]): Character[] {
   return chars.map((c) => {
-    //EXTRA CHOICES
     const charChoices: Choice[] = [];
-    const SpeciesBarks = new Map<Species, string>([
-      ['dog', 'Woof!'],
-      ['cat', 'Meow!'],
-      ['pony', 'Stomp!']
-    ]);
-    const barkable = SpeciesBarks.get(c.species);
-    if (barkable) {
-      charChoices.push({
-        buttonText: barkable,
-        made: (game) => {
-          const char = game.party[game.quaternionIndex];
-          //excercising
-          const newSTR = char.attributes.STR + 0.3;
-          const excerciseAttrUp =
-            Math.floor(char.attributes.STR) < Math.floor(newSTR);
-          const choiceMessage =
-            barkable +
-            (excerciseAttrUp ? ' (and their strength increased!)' : '');
-          char.attributes.STR = newSTR;
-          return {
-            gameState: game,
-            bluntConsumed: 0.05,
-            choiceResultMessage: choiceMessage
-          };
-        }
-      });
-    }
-
-    if (c.name === 'You') {
-      charChoices.push({
-        buttonText: 'Let me tell you of the beauty of Elbereth, maaan',
-        made: (game) => {
-          //TODO: Elbereth - maybe kicks enemies out of the circle?
-          return { gameState: game, bluntConsumed: 0.5 };
-        }
-      });
-    }
-
     return {
       //defaults first...
       role: undefined,
       relationship: 'Party Member',
-      attributes: { STR: 10 },
+      attributes: AttrsDefault(),
       //HACK:  https://nethackwiki.com/wiki/Hit_points#Hit_points_gained_on_level_gain_and_starting_hitpoints
       hp: new Meter(c.level * 4),
+      ringFinger: undefined,
       tactics: { aggression: 0.2, looting: 0.2 },
       extraChoices: charChoices,
       //then the form object...

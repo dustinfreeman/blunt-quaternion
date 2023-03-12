@@ -2,18 +2,24 @@ import * as ROT from 'rot-js';
 
 import { Choice } from '.';
 import { GameState } from '../game';
+import { randomChoices } from '../utils';
 import * as World from '../world';
+import { Species } from '../world';
 
 export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
   const _choiceList: Choice[] = [
     {
-      buttonText: 'Think Deeply...',
-      made: (game) => {
+      buttonText: 'Think deep thoughts',
+      made: () => {
         return {
-          gameState: game,
-          bluntConsumed: 0.7,
-          //TODO: Excercise WIS
-          choiceResultMessage: 'I am a ' + char.species
+          bluntConsumed: 0.25,
+          choiceResultMessage:
+            (char.attributes.WIS.val() < 17
+              ? 'I am a ' + char.species
+              : 'I am a simulated ' +
+                char.species +
+                ' in a virtual environment.') +
+            (char.attributes.WIS.exercise(0.3) ? ' (my wisdom increased!)' : '')
         };
       }
     }
@@ -60,41 +66,80 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
 
   if (char.relationship === 'Party Member') {
     if (game.inventory.length > 0) {
-      const randomToConsume = ROT.RNG.getItem(game.inventory);
+      const rummagingInventory = randomChoices(game.inventory, 3);
+      _choiceList.push({
+        buttonText: 'Let me rummage through our inventory...',
+        made: () => {
+          return {
+            gameState: {
+              followUpChoices: rummagingInventory
+                .map((item) => {
+                  if (item.itemType === 'ring') {
+                    if (char.ringFinger) {
+                      return undefined;
+                    } else {
+                      return World.PutOnChoice(char, item);
+                    }
+                  }
+
+                  if (['comestible', 'potion'].includes(item.itemType)) {
+                    return World.ConsumeChoice(char, item);
+                  }
+
+                  //other item, possibly quest?
+                  return undefined;
+                })
+                .filter((choice) => choice) as Choice[] //filter undefined
+            },
+            bluntConsumed: 0.15,
+            choiceResultMessage: 'What do we have here?'
+          };
+        }
+      });
+
+      //putting random stuff in your mouth
+      const consumables = game.inventory.filter((item) =>
+        ['comestible', 'potion'].includes(item.itemType)
+      );
+      const randomToConsume = ROT.RNG.getItem(consumables);
       if (randomToConsume?.onConsume !== undefined) {
-        _choiceList.push({
-          buttonText:
-            "I'm going to " +
-            World.ConsumeVerb(randomToConsume) +
-            ' this ' +
-            randomToConsume.name,
-          made: (game) => {
-            const onConsumeMessage = randomToConsume.onConsume?.(char);
-            return {
-              gameState: {
-                ...game,
-                inventory: game.inventory.filter(
-                  (item) => item !== randomToConsume
-                )
-              },
-              bluntConsumed: 0.1,
-              choiceResultMessage: onConsumeMessage ?? 'yum!'
-            };
-          }
-        });
+        _choiceList.push(World.ConsumeChoice(char, randomToConsume));
       }
     }
+
+    if (char.ringFinger === undefined) {
+      const wearables = game.inventory.filter((item) =>
+        ['ring'].includes(item.itemType)
+      );
+      const randomWearable = ROT.RNG.getItem(wearables);
+      if (randomWearable) {
+        _choiceList.push(World.PutOnChoice(char, randomWearable));
+      }
+    } else {
+      _choiceList.push({
+        buttonText: "I'm going to take off this " + char.ringFinger.name,
+        made: (game) => {
+          game.inventory.push(char.ringFinger!);
+          char.ringFinger = undefined;
+          return {
+            bluntConsumed: 0.1,
+            choiceResultMessage: 'it was ugly anyway'
+          };
+        }
+      });
+    }
+
+    //TACTICS
     if (char.tactics.aggression < 1) {
       _choiceList.push({
         buttonText: 'I should be more aggressive.',
-        made: (game) => {
+        made: () => {
           char.tactics.aggression = ROT.Util.clamp(
             char.tactics.aggression + 0.25,
             0,
             1
           );
           return {
-            gameState: game,
             bluntConsumed: 0.1,
             choiceResultMessage: 'grrr!'
           };
@@ -104,16 +149,55 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
     if (char.tactics.aggression > 0) {
       _choiceList.push({
         buttonText: 'I should be less aggressive.',
-        made: (game) => {
+        made: () => {
           char.tactics.aggression = ROT.Util.clamp(
             char.tactics.aggression - 0.25,
             0,
             1
           );
           return {
-            gameState: game,
             bluntConsumed: 0.3,
             choiceResultMessage: 'I will try to get into less confrontations.'
+          };
+        }
+      });
+    }
+
+    if (char.name === 'You' && !game.elberethed) {
+      _choiceList.push({
+        buttonText: 'Let me tell you of the beauty of Elbereth, man',
+        made: () => {
+          return {
+            gameState: { elberethed: true },
+            bluntConsumed: 0.5,
+            choiceResultMessage:
+              'I have asked Elbereth to protect us this coming delve'
+          };
+        }
+      });
+    }
+
+    const SpeciesBarks = new Map<Species, string>([
+      ['dog', 'Woof!'],
+      ['cat', 'Meow!'],
+      ['pony', 'Stomp!']
+    ]);
+    const barkable = SpeciesBarks.get(char.species);
+    if (barkable) {
+      _choiceList.push({
+        buttonText: barkable,
+        made: (game) => {
+          const char = game.party[game.quaternionIndex];
+
+          //exercising
+          const choiceMessage =
+            barkable +
+            (char.attributes.STR.exercise(0.3)
+              ? ' (my strength increased!)'
+              : '');
+          return {
+            bluntConsumed: 0.05,
+            choiceResultMessage: choiceMessage
           };
         }
       });

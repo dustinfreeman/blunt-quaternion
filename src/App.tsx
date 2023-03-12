@@ -150,14 +150,18 @@ function App() {
       setChoiceList([]);
       return;
     }
-    const _choiceList: Choices.Choice[] = Choices.ChoicesFor(char, game);
 
+    if (game.followUpChoices.length > 0) {
+      setChoiceList(ROT.RNG.shuffle(game.followUpChoices));
+      return;
+    }
+
+    const _choiceList: Choices.Choice[] = Choices.ChoicesFor(char, game);
     //filter choices for relevance
     filterInPlace(
       _choiceList,
       (_choice) => !_choice.relevant || _choice.relevant(char, game)
     );
-
     setChoiceList(ROT.RNG.shuffle(randomChoices(_choiceList, 3)));
   }
   useEffect(() => {
@@ -171,7 +175,8 @@ function App() {
       bluntFraction: game.bluntFraction - 0.1,
       quaternionIndex:
         (game.quaternionIndex + rotateRate * 1.1) % game.party.length,
-      lastChoiceResult: ''
+      lastChoiceResult: '',
+      followUpChoices: []
     });
 
     setChoiceList([]);
@@ -180,6 +185,8 @@ function App() {
   const makeChoice = useCallback(
     (choiceResult: Choices.ChoiceResult) => {
       setGame({
+        ...game,
+        followUpChoices: [],
         ...choiceResult.gameState,
         bluntFraction: game.bluntFraction - choiceResult.bluntConsumed,
         lastChoiceResult: choiceResult.choiceResultMessage ?? ''
@@ -205,21 +212,55 @@ function App() {
     const party = ROT.RNG.shuffle(game.party);
     //Loot Simulation
     const inventory = game.inventory;
-    inventory.push(...randomChoices(World.LootList, 1));
+    const someoneWearingRingOfSearching =
+      party.filter((c) => c.ringFinger?.name === 'ring of searching').length >
+      0;
+    inventory.push(
+      ...randomChoices(
+        World.LootList,
+        2 + (someoneWearingRingOfSearching ? 2 : 0)
+      )
+    );
 
     //Combat Simulation
-    party.forEach((c: World.Character) => {
-      const combatIncidence =
-        (c.tactics.aggression + 0.25) *
-        (game.currentDungeonLevel + 1) *
-        ROT.RNG.getUniform();
+    const simulateCombat = () => {
+      //TODO: assemble total combat power, instead of per-party member
+      party.forEach((c: World.Character) => {
+        const wearingRingOfConflict = c.ringFinger?.name === 'ring of conflict';
+        const combatIncidence =
+          (c.tactics.aggression + 0.25) *
+          (game.currentDungeonLevel + 1) *
+          (wearingRingOfConflict ? 2 : 1) *
+          (ROT.RNG.getUniform() + 0.5);
 
-      c.hp.update(
-        // -1
-        Math.round(ROT.RNG.getUniform() * -3 * combatIncidence)
-      );
-      World.addXP(c, Math.round(combatIncidence * 4));
-    });
+        //how much damage you took
+        // wearing a ring of warning perhaps means you were able to
+        // avoid combats you wouldn't do well in.
+        const wearingRingOfWarning = c.ringFinger?.name === 'ring of warning';
+        c.hp.update(
+          Math.round(
+            ROT.RNG.getUniform() *
+              -3 *
+              combatIncidence *
+              (wearingRingOfWarning ? 0.5 : 1)
+          )
+        );
+
+        //how much good combats you completed
+        const strengthScaling = 2 * ((c.attributes.STR.val() - 10) / 10);
+        let wisdomScaling = 1;
+        if (c.role && ['Valkyrie', 'Wizard'].includes(c.role)) {
+          wisdomScaling *= 2 * ((c.attributes.WIS.val() - 10) / 10);
+        }
+        World.addXP(
+          c,
+          Math.round(combatIncidence * 4 * strengthScaling * wisdomScaling)
+        );
+      });
+    };
+    if (!game.elberethed || ROT.RNG.getUniform() < 0.2) {
+      simulateCombat();
+    }
     //Remove dead party members
     const freshCorpses = party.filter((p) => p.hp.current <= 0);
     filterInPlace(party, (p) => p.hp.current > 0);
@@ -271,7 +312,10 @@ function App() {
         //reset quaternion for next blaze
         quaternionIndex: ROT.RNG.getUniformInt(0, game.party.length - 1),
         bluntFraction: 1,
-        lastChoiceResult: ''
+        lastChoiceResult: game.elberethed
+          ? 'Thank Elbereth for protecting us'
+          : '',
+        elberethed: false
       });
     }, 500);
   }, [game, setGame]);
