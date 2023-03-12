@@ -212,7 +212,15 @@ function App() {
     const party = ROT.RNG.shuffle(game.party);
     //Loot Simulation
     const inventory = game.inventory;
-    inventory.push(...randomChoices(World.LootList, 2));
+    const someoneWearingRingOfSearching =
+      party.filter((c) => c.ringFinger?.name === 'ring of searching').length >
+      0;
+    inventory.push(
+      ...randomChoices(
+        World.LootList,
+        2 + (someoneWearingRingOfSearching ? 2 : 0)
+      )
+    );
 
     //Combat Simulation
     const simulateCombat = () => {
@@ -223,7 +231,7 @@ function App() {
           (c.tactics.aggression + 0.25) *
           (game.currentDungeonLevel + 1) *
           (wearingRingOfConflict ? 2 : 1) *
-          (ROT.RNG.getUniform() + 0.2);
+          (ROT.RNG.getUniform() + 0.5);
 
         //how much damage you took
         // wearing a ring of warning perhaps means you were able to

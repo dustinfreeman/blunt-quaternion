@@ -51,14 +51,17 @@ export const LootList: Item[] = [
       return 'I polymorphed myself into a ' + newSpecies;
     }
   },
+  // https://nethackwiki.com/wiki/Ring#Table_of_rings
   {
-    //https://nethackwiki.com/wiki/Ring_of_warning
     name: 'ring of warning',
     itemType: 'ring'
   },
   {
-    //https://nethackwiki.com/wiki/Ring_of_conflict
     name: 'ring of conflict',
+    itemType: 'ring'
+  },
+  {
+    name: 'ring of searching',
     itemType: 'ring'
   }
 ];
