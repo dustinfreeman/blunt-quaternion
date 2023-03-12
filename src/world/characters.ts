@@ -12,7 +12,15 @@ export type Role = (typeof RolesList)[number];
 export const PlayerSpeciesList = ['human', 'dwarf', 'elf', 'gnome', 'orc'];
 // https://nethackwiki.com/wiki/Pet
 export const Pets = ['dog', 'cat', 'pony'];
-export const Monsters = ['owlbear', 'mastodon'];
+export const Monsters = [
+  'owlbear',
+  'mastodon',
+  'newt',
+  'kobold',
+  'minotaur',
+  'snake',
+  'centaur'
+];
 export const UniqueSpecies = ['God'];
 const SpeciesList = [
   undefined,
@@ -56,17 +64,29 @@ export function Display(c: Character): { char: string } {
   if (c.name === 'You') {
     return { char: '@' };
   }
+  if (c.name?.includes('Vampire')) {
+    return { char: 'V' };
+  }
 
   const SpeciesCharMap = new Map<Species, string>([
     ['dog', 'd'],
     ['cat', 'f'],
     ['pony', 'u'],
+
     ['dwarf', 'h'],
     ['human', '@'],
     ['elf', '@'],
     ['gnome', 'G'],
     ['orc', 'o'],
-    ['owlbear', 'Y']
+
+    ['owlbear', 'Y'],
+    ['mastodon', 'q'],
+    ['newt', ':'],
+    ['kobold', 'k'],
+    ['minotaur', 'H'],
+    ['snake', 'S'],
+    ['centaur', 'C'],
+    ['demon', '&']
   ]);
   const char = SpeciesCharMap.get(c.species);
   if (char) {
@@ -75,6 +95,11 @@ export function Display(c: Character): { char: string } {
 
   return { char: '?' };
 }
+// SpeciesList.forEach((species) => {
+//   if (Display(FleshOut([{ species: species, level: 1 }])[0]).char === '?') {
+//     console.warn('Missing display character for species ', species);
+//   }
+// });
 
 export function FleshOut(chars: FormCharacter[]): Character[] {
   return chars.map((c) => {

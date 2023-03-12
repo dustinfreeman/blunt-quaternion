@@ -44,12 +44,21 @@ export const LootList: Item[] = [
     }
   },
   {
-    name: 'Potion of polymorph',
+    name: 'potion of polymorph',
     itemType: 'potion',
     onConsume: (c) => {
       const newSpecies = ROT.RNG.getItem(PlayerSpeciesList) as string;
       c.species = newSpecies;
       return 'I polymorphed myself into a ' + newSpecies;
+    }
+  },
+  {
+    name: 'potion of booze',
+    itemType: 'potion',
+    onConsume: (c) => {
+      c.hp.update(2);
+      c.attributes.WIS.exercise(-0.2);
+      return 'I feel satiated, yet dumber';
     }
   },
   // https://nethackwiki.com/wiki/Ring#Table_of_rings

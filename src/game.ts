@@ -90,7 +90,7 @@ export const Begin = (): GameState => {
         buttonText: 'Go my child',
         made: () => {
           return {
-            choiceResultMessage: 'You must retrive the Amulet',
+            choiceResultMessage: 'You must retrieve the Amulet',
             bluntConsumed: 0.01
           };
         }
