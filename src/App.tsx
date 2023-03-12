@@ -254,7 +254,7 @@ function App() {
         }
         World.addXP(
           c,
-          Math.round(combatIncidence * 4 * strengthScaling * wisdomScaling)
+          Math.round(combatIncidence * 16 * strengthScaling * wisdomScaling)
         );
       });
     };

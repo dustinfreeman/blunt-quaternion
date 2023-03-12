@@ -11,6 +11,7 @@ import {
   Item
 } from './world';
 import * as Choices from './choices';
+import { Meter } from './utils';
 
 export interface GameState {
   party: Character[];
@@ -66,9 +67,20 @@ export const Begin = (): GameState => {
     // https://nethackwiki.com/wiki/Player
     name: 'You',
     role: RNG.getItem(Roles) as Role,
-    level: 2,
+    level: 1,
     species: RNG.getItem(PlayerSpeciesList) as Species
   };
+  // https://nethackwiki.com/wiki/Hit_points#Hit_points_gained_on_level_gain_and_starting_hitpoints
+  You.hp = new Meter(
+    new Map<Role, number>([
+      ['Archeologist', 11],
+      ['Ranger', 13],
+      ['Rogue', 10],
+      ['Wizard', 10],
+      ['Valkyrie', 14]
+    ]).get(You.role)!
+  );
+
   const Pet: FormCharacter = {
     level: 1,
     species: RNG.getItem(Pets) as Species

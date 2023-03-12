@@ -1,3 +1,5 @@
+import * as ROT from 'rot-js';
+
 import { Choice } from '../choices/ui';
 import { Meter } from '../utils';
 import { Item, AttrBlock, AttrsDefault } from '.';
@@ -23,7 +25,7 @@ export const Monsters = [
 ];
 export const UniqueSpecies = ['God'];
 const SpeciesList = [
-  undefined,
+  // undefined,
   ...PlayerSpeciesList,
   ...Pets,
   ...Monsters,
@@ -140,8 +142,36 @@ export function addXP(char: Character, xp: number) {
   //https://nethackwiki.com/wiki/Experience_level#Experience_points_required_per_level
   const lvl = Math.floor(char.level);
   if (lvl === xpPerLevel.length - 1) {
+    //already max level
     return;
   }
 
-  char.level += xp / (xpPerLevel[lvl + 1] - xpPerLevel[lvl]);
+  const nextLevel = char.level + xp / (xpPerLevel[lvl + 1] - xpPerLevel[lvl]);
+  if (Math.floor(nextLevel) !== lvl) {
+    //level up!
+
+    // https://nethackwiki.com/wiki/Hit_points#Hit_points_gained_on_level_gain_and_starting_hitpoints
+    let newHPMax = char.hp.max;
+    if (char.role) {
+      if (char.role === 'Ranger') {
+        newHPMax += ROT.RNG.getUniformInt(1, 6);
+      } else {
+        newHPMax += ROT.RNG.getUniformInt(1, 8);
+      }
+    }
+    if (['elf', 'gnome', 'orc'].includes(char.species)) {
+      newHPMax += 1;
+    } else if (char.species === 'human') {
+      newHPMax += ROT.RNG.getUniformInt(1, 2);
+    } else if (char.species === 'dwarf') {
+      newHPMax += ROT.RNG.getUniformInt(1, 3);
+    } else {
+      // https://nethackwiki.com/wiki/Hit_points#Normal_case
+      newHPMax += ROT.RNG.getUniformInt(1, 8);
+    }
+
+    char.hp = new Meter(newHPMax); //also get full health.
+  }
+
+  char.level = nextLevel;
 }

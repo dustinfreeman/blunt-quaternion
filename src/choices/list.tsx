@@ -4,7 +4,6 @@ import { Choice } from '.';
 import { GameState } from '../game';
 import { randomChoices } from '../utils';
 import * as World from '../world';
-import { Species } from '../world';
 
 export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
   const _choiceList: Choice[] = [
@@ -23,6 +22,13 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
         };
       }
     }
+    // {
+    //   buttonText: 'I would like to eat the XP wafer',
+    //   made: () => {
+    //     World.addXP(char, World.xpPerLevel[Math.floor(char.level)] * 0.4);
+    //     return { bluntConsumed: 0.05 };
+    //   }
+    // }
     // {
     //   buttonText: "I'm going to drink this dubious potion",
     //   made: (game) => {
@@ -177,7 +183,7 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
       });
     }
 
-    const SpeciesBarks = new Map<Species, string>([
+    const SpeciesBarks = new Map<World.Species, string>([
       ['dog', 'Woof!'],
       ['cat', 'Meow!'],
       ['pony', 'Stomp!']
