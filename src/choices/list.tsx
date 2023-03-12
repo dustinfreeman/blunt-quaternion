@@ -71,8 +71,14 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
   ];
 
   if (char.relationship === 'Party Member') {
-    if (game.inventory.length > 0) {
-      const rummagingInventory = randomChoices(game.inventory, 3);
+    const rummageable = game.inventory.filter((item) => {
+      if (char.ringFinger && item.itemType === 'ring') {
+        return false;
+      }
+      return true;
+    });
+    if (rummageable.length > 0) {
+      const rummagingInventory = randomChoices(rummageable, 3);
       _choiceList.push({
         buttonText: 'Let me rummage through our inventory...',
         made: () => {
@@ -113,6 +119,7 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
       }
     }
 
+    //put on/take off rings
     if (char.ringFinger === undefined) {
       const wearables = game.inventory.filter((item) =>
         ['ring'].includes(item.itemType)
