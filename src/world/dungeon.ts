@@ -75,7 +75,17 @@ export const MazesOfMenace: DungeonLevel[] = [
     ]
   },
   { name: "Mine's End" }, // https://nethackwiki.com/wiki/Mines%27_End
-  { name: 'Fort Ludios' }
+  {
+    name: 'Fort Ludios',
+    characters: [
+      {
+        // https://nethackwiki.com/wiki/Mastodon
+        species: 'mastodon',
+        relationship: 'Resident',
+        level: 20
+      }
+    ]
+  }
 ];
 
 const AmuletOfYendor: Item = {

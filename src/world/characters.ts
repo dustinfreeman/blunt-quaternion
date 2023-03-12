@@ -18,7 +18,7 @@ export type Role = (typeof Roles)[number];
 export const PlayerSpeciesList = ['human', 'dwarf', 'elf', 'gnome', 'orc'];
 // https://nethackwiki.com/wiki/Pet
 export const Pets = ['dog', 'cat', 'pony'];
-export const Monsters = ['owlbear'];
+export const Monsters = ['owlbear', 'mastodon'];
 const SpeciesList = [undefined, ...PlayerSpeciesList, ...Pets, ...Monsters];
 export type Species = (typeof SpeciesList)[number];
 
