@@ -50,7 +50,7 @@ function App() {
     ctx.fillStyle = fs;
     ctx.fillRect(0, 0, ResponsiveApp.width, ResponsiveApp.height);
 
-    if (game.party.length > 0 && game.currentDungeonLevel % 1 === 0) {
+    if (!partyIsDead() && game.currentDungeonLevel % 1 === 0) {
       //visible characters around quaternion
       ctx.fillStyle = 'white';
       ctx.font = String('160') + 'px monospace';
@@ -89,7 +89,7 @@ function App() {
     if (game.quaternionIndex % 1 === 0) {
       console.log('current: ', game);
     }
-    if (game.party.length > 0) {
+    if (!partyIsDead()) {
       //playing
       if (Math.floor(game.quaternionIndex) === game.quaternionIndex) {
         setCharInfo(UI.RenderCharInfo(game.party.at(game.quaternionIndex)));
@@ -100,7 +100,7 @@ function App() {
   }, [game]);
 
   //rotation animation
-  const rotateRate = 0.08;
+  const rotateRate = 0.12;
   useEffect(() => {
     const interval = setInterval(() => {
       const phase = game.quaternionIndex % 1;
@@ -403,7 +403,9 @@ function App() {
     //any party members with hp > 0 means the party is alive
     return (
       game.party.length === 0 ||
-      game.party.filter((p) => p.hp.current > 0).length === 0
+      game.party
+        .filter((c) => c.hp.current > 0)
+        .filter((c) => c.relationship === 'Party Member').length === 0
     );
   }
 
