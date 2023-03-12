@@ -4,7 +4,6 @@ import { Choice } from '.';
 import { GameState } from '../game';
 import { randomChoices } from '../utils';
 import * as World from '../world';
-import { Species } from '../world';
 
 export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
   const _choiceList: Choice[] = [
@@ -23,6 +22,13 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
         };
       }
     }
+    // {
+    //   buttonText: 'I would like to eat the XP wafer',
+    //   made: () => {
+    //     World.addXP(char, World.xpPerLevel[Math.floor(char.level)] * 0.4);
+    //     return { bluntConsumed: 0.05 };
+    //   }
+    // }
     // {
     //   buttonText: "I'm going to drink this dubious potion",
     //   made: (game) => {
@@ -65,8 +71,14 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
   ];
 
   if (char.relationship === 'Party Member') {
-    if (game.inventory.length > 0) {
-      const rummagingInventory = randomChoices(game.inventory, 3);
+    const rummageable = game.inventory.filter((item) => {
+      if (char.ringFinger && item.itemType === 'ring') {
+        return false;
+      }
+      return true;
+    });
+    if (rummageable.length > 0) {
+      const rummagingInventory = randomChoices(rummageable, 3);
       _choiceList.push({
         buttonText: 'Let me rummage through our inventory...',
         made: () => {
@@ -107,6 +119,7 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
       }
     }
 
+    //put on/take off rings
     if (char.ringFinger === undefined) {
       const wearables = game.inventory.filter((item) =>
         ['ring'].includes(item.itemType)
@@ -132,7 +145,7 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
     //TACTICS
     if (char.tactics.aggression < 1) {
       _choiceList.push({
-        buttonText: 'I should be more aggressive.',
+        buttonText: 'Tactics: I should be more aggressive.',
         made: () => {
           char.tactics.aggression = ROT.Util.clamp(
             char.tactics.aggression + 0.25,
@@ -148,7 +161,7 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
     }
     if (char.tactics.aggression > 0) {
       _choiceList.push({
-        buttonText: 'I should be less aggressive.',
+        buttonText: 'Tactics: I should be less aggressive.',
         made: () => {
           char.tactics.aggression = ROT.Util.clamp(
             char.tactics.aggression - 0.25,
@@ -171,13 +184,13 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
             gameState: { elberethed: true },
             bluntConsumed: 0.5,
             choiceResultMessage:
-              'I have asked Elbereth to protect us this coming delve'
+              'I have asked Elbereth to protect us for the next delve'
           };
         }
       });
     }
 
-    const SpeciesBarks = new Map<Species, string>([
+    const SpeciesBarks = new Map<World.Species, string>([
       ['dog', 'Woof!'],
       ['cat', 'Meow!'],
       ['pony', 'Stomp!']

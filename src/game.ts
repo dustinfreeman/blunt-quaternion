@@ -11,6 +11,7 @@ import {
   Item
 } from './world';
 import * as Choices from './choices';
+import { Meter } from './utils';
 
 export interface GameState {
   party: Character[];
@@ -46,7 +47,7 @@ const SurfaceTutorialGuide: FormCharacter = {
   role: 'Archeologist',
   level: 10,
   species: 'gnome',
-  relationship: 'Local Guide',
+  relationship: 'Guide',
   extraChoices: [
     {
       buttonText: 'Let me tell you about your quest.',
@@ -62,20 +63,54 @@ const SurfaceTutorialGuide: FormCharacter = {
 };
 
 export const Begin = (): GameState => {
-  const party: FormCharacter[] = [
-    SurfaceTutorialGuide,
-    {
-      // https://nethackwiki.com/wiki/Player
-      name: 'You',
-      role: RNG.getItem(Roles) as Role,
-      level: 2,
-      species: RNG.getItem(PlayerSpeciesList) as Species
-    },
-    {
-      level: 1,
-      species: RNG.getItem(Pets) as Species
-    }
-  ];
+  const You: FormCharacter = {
+    // https://nethackwiki.com/wiki/Player
+    name: 'You',
+    role: RNG.getItem(Roles) as Role,
+    level: 1,
+    species: RNG.getItem(PlayerSpeciesList) as Species
+  };
+  // https://nethackwiki.com/wiki/Hit_points#Hit_points_gained_on_level_gain_and_starting_hitpoints
+  You.hp = new Meter(
+    new Map<Role, number>([
+      ['Archeologist', 11],
+      ['Ranger', 13],
+      ['Rogue', 10],
+      ['Wizard', 10],
+      ['Valkyrie', 14]
+    ]).get(You.role)!
+  );
+
+  const Pet: FormCharacter = {
+    level: 1,
+    species: RNG.getItem(Pets) as Species
+  };
+  const YourGod: FormCharacter = {
+    // https://nethackwiki.com/wiki/God
+    name: new Map<Role, string>([
+      ['Archeologist', 'Camaxtli'],
+      ['Ranger', 'Venus'],
+      ['Valkyrie', 'Odin'],
+      ['Wizard', 'Thoth'],
+      ['Rogue', 'Mog']
+    ]).get(You.role),
+    species: 'God',
+    level: 1000000,
+    relationship: 'Guide',
+    extraChoices: [
+      {
+        buttonText: 'Go my child',
+        made: () => {
+          return {
+            choiceResultMessage: 'You must retrieve the Amulet',
+            bluntConsumed: 0.01
+          };
+        }
+      }
+    ]
+  };
+
+  const party: FormCharacter[] = [SurfaceTutorialGuide, You, Pet, YourGod];
 
   return {
     party: FleshOut(party),

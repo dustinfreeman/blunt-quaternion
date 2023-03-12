@@ -23,7 +23,7 @@ const ChoiceList = styled.div({
   // backgroundColor: '#fa48',
   bottom: 10,
   left: ResponsiveApp.width / 2 + 20,
-  right: 60
+  right: 55
 });
 
 const ChoiceButton = styled.button({

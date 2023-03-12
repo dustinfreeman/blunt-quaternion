@@ -50,7 +50,7 @@ function App() {
     ctx.fillStyle = fs;
     ctx.fillRect(0, 0, ResponsiveApp.width, ResponsiveApp.height);
 
-    if (game.party.length > 0 && game.currentDungeonLevel % 1 === 0) {
+    if (!partyIsDead() && game.currentDungeonLevel % 1 === 0) {
       //visible characters around quaternion
       ctx.fillStyle = 'white';
       ctx.font = String('160') + 'px monospace';
@@ -87,9 +87,9 @@ function App() {
   //game updated
   useEffect(() => {
     if (game.quaternionIndex % 1 === 0) {
-      console.log('current: ', game);
+      console.log('game state: ', game);
     }
-    if (game.party.length > 0) {
+    if (!partyIsDead()) {
       //playing
       if (Math.floor(game.quaternionIndex) === game.quaternionIndex) {
         setCharInfo(UI.RenderCharInfo(game.party.at(game.quaternionIndex)));
@@ -100,7 +100,7 @@ function App() {
   }, [game]);
 
   //rotation animation
-  const rotateRate = 0.08;
+  const rotateRate = 0.12;
   useEffect(() => {
     const interval = setInterval(() => {
       const phase = game.quaternionIndex % 1;
@@ -247,14 +247,15 @@ function App() {
         );
 
         //how much good combats you completed
-        const strengthScaling = 2 * ((c.attributes.STR.val() - 10) / 10);
+        // https://nethackwiki.com/wiki/Strength#Uses_of_strength
+        const strengthScaling = 2 * ((c.attributes.STR.val() - 10) / 10) + 1;
         let wisdomScaling = 1;
         if (c.role && ['Valkyrie', 'Wizard'].includes(c.role)) {
-          wisdomScaling *= 2 * ((c.attributes.WIS.val() - 10) / 10);
+          wisdomScaling *= 2 * ((c.attributes.WIS.val() - 10) / 10) + 1;
         }
         World.addXP(
           c,
-          Math.round(combatIncidence * 4 * strengthScaling * wisdomScaling)
+          Math.round(combatIncidence * 16 * strengthScaling * wisdomScaling)
         );
       });
     };
@@ -296,10 +297,11 @@ function App() {
       ];
       //definitely add guides
       //TODO: generalize "move from one array to another with a filter"
-      party.push(...locals.filter((p) => p.relationship === 'Local Guide'));
-      filterInPlace(locals, (p) => p.relationship !== 'Local Guide');
-      //choose another random local
-      party.push(...randomChoices(locals, 1));
+      party.push(...locals.filter((p) => p.relationship === 'Guide'));
+      filterInPlace(locals, (p) => p.relationship !== 'Guide');
+      if (party.length < 4) {
+        party.push(...randomChoices(locals, 4 - party.length));
+      }
 
       // destination:
       setGame({
@@ -403,7 +405,9 @@ function App() {
     //any party members with hp > 0 means the party is alive
     return (
       game.party.length === 0 ||
-      game.party.filter((p) => p.hp.current > 0).length === 0
+      game.party
+        .filter((c) => c.hp.current > 0)
+        .filter((c) => c.relationship === 'Party Member').length === 0
     );
   }
 

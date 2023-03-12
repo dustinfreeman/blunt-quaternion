@@ -3,13 +3,14 @@ import * as THREE from 'three';
 import * as ResponsiveApp from './responsive';
 
 export const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x8855aa);
+// scene.background = new THREE.Color(0x8855aa);
+scene.background = new THREE.Color(0x000);
 
 export const camera = new THREE.PerspectiveCamera(
   75,
   ResponsiveApp.width / ResponsiveApp.height,
-  1,
-  13
+  0.9,
+  7
 );
 camera.position.z = 1;
 camera.setRotationFromEuler(new THREE.Euler(Math.PI * 0.5, 0, 0));
@@ -20,8 +21,8 @@ const material = new THREE.MeshDepthMaterial({ wireframe: false });
 
 //Cube Grid
 const levelObjects: THREE.Object3D[] = [];
-const innerRoom = 2;
-const outerWall = 5;
+const innerRoom = 1;
+const outerWall = 7;
 function makeCubeAt(x: number, y: number, z: number) {
   const cube = new THREE.Mesh(geometry, material);
   cube.position.set(x, y, z);
@@ -30,6 +31,9 @@ function makeCubeAt(x: number, y: number, z: number) {
 }
 
 export function createRandomLevel() {
+  levelObjects.forEach((cube) => scene.remove(cube));
+  levelObjects.splice(0, levelObjects.length);
+
   for (let i = -outerWall; i <= outerWall; i++) {
     for (let j = -outerWall; j <= outerWall; j++) {
       //floor
