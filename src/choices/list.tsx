@@ -72,16 +72,24 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
         made: () => {
           return {
             gameState: {
-              followUpChoices: rummagingInventory.map((item) => {
-                return {
-                  buttonText: 'Do something with ' + item.name,
-                  made: () => {
-                    return {
-                      bluntConsumed: 0.05
-                    };
+              followUpChoices: rummagingInventory
+                .map((item) => {
+                  if (item.itemType === 'ring') {
+                    if (char.ringFinger) {
+                      return undefined;
+                    } else {
+                      return World.PutOnChoice(char, item);
+                    }
                   }
-                };
-              })
+
+                  if (['comestible', 'potion'].includes(item.itemType)) {
+                    return World.ConsumeChoice(char, item);
+                  }
+
+                  //other item, possibly quest?
+                  return undefined;
+                })
+                .filter((choice) => choice) as Choice[] //filter undefined
             },
             bluntConsumed: 0.15,
             choiceResultMessage: 'What do we have here?'
@@ -95,25 +103,7 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
       );
       const randomToConsume = ROT.RNG.getItem(consumables);
       if (randomToConsume?.onConsume !== undefined) {
-        _choiceList.push({
-          buttonText:
-            "I'm going to " +
-            World.ConsumeVerb(randomToConsume) +
-            ' this ' +
-            randomToConsume.name,
-          made: (game) => {
-            const onConsumeMessage = randomToConsume.onConsume?.(char);
-            return {
-              gameState: {
-                inventory: game.inventory.filter(
-                  (item) => item !== randomToConsume
-                )
-              },
-              bluntConsumed: 0.1,
-              choiceResultMessage: onConsumeMessage ?? 'yum!'
-            };
-          }
-        });
+        _choiceList.push(World.ConsumeChoice(char, randomToConsume));
       }
     }
 
@@ -123,21 +113,7 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
       );
       const randomWearable = ROT.RNG.getItem(wearables);
       if (randomWearable) {
-        _choiceList.push({
-          buttonText: "I'm going to put on this " + randomWearable.name,
-          made: (game) => {
-            char.ringFinger = randomWearable;
-            return {
-              gameState: {
-                inventory: game.inventory.filter(
-                  (item) => item !== randomWearable
-                )
-              },
-              bluntConsumed: 0.1,
-              choiceResultMessage: 'shiny!'
-            };
-          }
-        });
+        _choiceList.push(World.PutOnChoice(char, randomWearable));
       }
     } else {
       _choiceList.push({

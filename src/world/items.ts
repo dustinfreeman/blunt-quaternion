@@ -1,4 +1,5 @@
 import * as ROT from 'rot-js';
+import * as Choices from '../choices';
 import { Character, PlayerSpeciesList } from './characters';
 
 // https://nethackwiki.com/wiki/Item
@@ -65,3 +66,35 @@ export const LootList: Item[] = [
     itemType: 'ring'
   }
 ];
+
+export function ConsumeChoice(char: Character, item: Item): Choices.Choice {
+  return {
+    buttonText: "I'm going to " + ConsumeVerb(item) + ' this ' + item.name,
+    made: (game) => {
+      const onConsumeMessage = item.onConsume?.(char);
+      return {
+        gameState: {
+          inventory: game.inventory.filter((item) => item !== item)
+        },
+        bluntConsumed: 0.1,
+        choiceResultMessage: onConsumeMessage ?? 'yum!'
+      };
+    }
+  };
+}
+
+export function PutOnChoice(char: Character, item: Item): Choices.Choice {
+  return {
+    buttonText: "I'm going to put on this " + item.name,
+    made: (game) => {
+      char.ringFinger = item;
+      return {
+        gameState: {
+          inventory: game.inventory.filter((_item) => _item !== item)
+        },
+        bluntConsumed: 0.1,
+        choiceResultMessage: 'shiny!'
+      };
+    }
+  };
+}
