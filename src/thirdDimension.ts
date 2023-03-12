@@ -31,6 +31,9 @@ function makeCubeAt(x: number, y: number, z: number) {
 }
 
 export function createRandomLevel() {
+  levelObjects.forEach((cube) => scene.remove(cube));
+  levelObjects.splice(0, levelObjects.length);
+
   for (let i = -outerWall; i <= outerWall; i++) {
     for (let j = -outerWall; j <= outerWall; j++) {
       //floor
