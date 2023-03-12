@@ -175,7 +175,8 @@ function App() {
       bluntFraction: game.bluntFraction - 0.1,
       quaternionIndex:
         (game.quaternionIndex + rotateRate * 1.1) % game.party.length,
-      lastChoiceResult: ''
+      lastChoiceResult: '',
+      followUpChoices: []
     });
 
     setChoiceList([]);
