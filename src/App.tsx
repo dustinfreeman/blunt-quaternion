@@ -296,8 +296,8 @@ function App() {
       ];
       //definitely add guides
       //TODO: generalize "move from one array to another with a filter"
-      party.push(...locals.filter((p) => p.relationship === 'Local Guide'));
-      filterInPlace(locals, (p) => p.relationship !== 'Local Guide');
+      party.push(...locals.filter((p) => p.relationship === 'Guide'));
+      filterInPlace(locals, (p) => p.relationship !== 'Guide');
       //choose another random local
       party.push(...randomChoices(locals, 1));
 

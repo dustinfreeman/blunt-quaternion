@@ -46,7 +46,7 @@ const SurfaceTutorialGuide: FormCharacter = {
   role: 'Archeologist',
   level: 10,
   species: 'gnome',
-  relationship: 'Local Guide',
+  relationship: 'Guide',
   extraChoices: [
     {
       buttonText: 'Let me tell you about your quest.',
@@ -62,20 +62,43 @@ const SurfaceTutorialGuide: FormCharacter = {
 };
 
 export const Begin = (): GameState => {
-  const party: FormCharacter[] = [
-    SurfaceTutorialGuide,
-    {
-      // https://nethackwiki.com/wiki/Player
-      name: 'You',
-      role: RNG.getItem(Roles) as Role,
-      level: 2,
-      species: RNG.getItem(PlayerSpeciesList) as Species
-    },
-    {
-      level: 1,
-      species: RNG.getItem(Pets) as Species
-    }
-  ];
+  const You: FormCharacter = {
+    // https://nethackwiki.com/wiki/Player
+    name: 'You',
+    role: RNG.getItem(Roles) as Role,
+    level: 2,
+    species: RNG.getItem(PlayerSpeciesList) as Species
+  };
+  const Pet: FormCharacter = {
+    level: 1,
+    species: RNG.getItem(Pets) as Species
+  };
+  const YourGod: FormCharacter = {
+    // https://nethackwiki.com/wiki/God
+    name: new Map<Role, string>([
+      ['Archeologist', 'Camaxtli'],
+      ['Ranger', 'Venus'],
+      ['Valkyrie', 'Odin'],
+      ['Wizard', 'Thoth'],
+      ['Rogue', 'Mog']
+    ]).get(You.role),
+    species: 'God',
+    level: 1000000,
+    relationship: 'Guide',
+    extraChoices: [
+      {
+        buttonText: 'Go my child',
+        made: () => {
+          return {
+            choiceResultMessage: 'You must retrive the Amulet',
+            bluntConsumed: 0.01
+          };
+        }
+      }
+    ]
+  };
+
+  const party: FormCharacter[] = [SurfaceTutorialGuide, You, Pet, YourGod];
 
   return {
     party: FleshOut(party),

@@ -53,7 +53,7 @@ export const MazesOfMenace: DungeonLevel[] = [
       {
         name: 'The Oracle',
         species: 'human',
-        relationship: 'Local Guide',
+        relationship: 'Guide',
         level: 12,
         extraChoices: [
           {
@@ -116,7 +116,7 @@ MazesOfMenace.push({
       name: 'High Cleric of Moloch',
       species: 'human',
       level: 25,
-      relationship: 'Local Guide',
+      relationship: 'Guide',
       extraChoices: [GivingAmuletOfYendor]
     }
   ]

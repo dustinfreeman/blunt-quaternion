@@ -4,27 +4,28 @@ import { Item, AttrBlock, AttrsDefault } from '.';
 
 // https://nethackwiki.com/wiki/Role
 // https://nethackwiki.com/wiki/Role_difficulty#Role_difficulty_statistics
-export const Roles = [
-  undefined,
-  'Ranger',
-  'Rogue',
-  'Valkyrie',
-  'Archeologist',
-  'Wizard'
-];
-export type Role = (typeof Roles)[number];
+export const Roles = ['Ranger', 'Rogue', 'Valkyrie', 'Archeologist', 'Wizard'];
+const RolesList = [...Roles, undefined];
+export type Role = (typeof RolesList)[number];
 
 // https://nethackwiki.com/wiki/Race
 export const PlayerSpeciesList = ['human', 'dwarf', 'elf', 'gnome', 'orc'];
 // https://nethackwiki.com/wiki/Pet
 export const Pets = ['dog', 'cat', 'pony'];
 export const Monsters = ['owlbear', 'mastodon'];
-const SpeciesList = [undefined, ...PlayerSpeciesList, ...Pets, ...Monsters];
+export const UniqueSpecies = ['God'];
+const SpeciesList = [
+  undefined,
+  ...PlayerSpeciesList,
+  ...Pets,
+  ...Monsters,
+  ...UniqueSpecies
+];
 export type Species = (typeof SpeciesList)[number];
 
 type Relationship =
   | 'Party Member'
-  | 'Local Guide'
+  | 'Guide'
   | 'Enemy'
   | 'Resident'
   | 'Shopkeeper';

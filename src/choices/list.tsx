@@ -171,7 +171,7 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
             gameState: { elberethed: true },
             bluntConsumed: 0.5,
             choiceResultMessage:
-              'I have asked Elbereth to protect us this coming delve'
+              'I have asked Elbereth to protect us for the next delve'
           };
         }
       });
