@@ -126,7 +126,7 @@ function App() {
   });
 
   const StartGame = useCallback(() => {
-    createRandomLevel();
+    createRandomLevel({});
 
     setBGColors({
       c1: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
