@@ -10,6 +10,7 @@ import * as Comms from './comms';
 import * as Choices from './choices';
 import { filterInPlace, randomChoices } from './utils';
 import { scene, camera, createRandomLevel, animate } from './thirdDimension';
+import { MazesOfMenace } from './world';
 
 function App() {
   const canvasRef = React.createRef<HTMLCanvasElement>();
@@ -126,15 +127,15 @@ function App() {
   });
 
   const StartGame = useCallback(() => {
-    createRandomLevel({});
-
     setBGColors({
       c1: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
       c2: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
       opacity: 0.3
     });
 
-    setGame(Game.Begin());
+    const newGame = Game.Begin();
+    createRandomLevel(MazesOfMenace[newGame.currentDungeonLevel]!.threeD);
+    setGame(newGame);
   }, [game, setGame]);
 
   const StartScreen: JSX.Element = (
@@ -296,7 +297,7 @@ function App() {
     );
 
     setTimeout(() => {
-      createRandomLevel();
+      createRandomLevel(MazesOfMenace[nextDungeonLevel]!.threeD);
       setBGColors({
         c1: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
         c2: ROT.Color.add([cValRand(), cValRand(), cValRand()]),

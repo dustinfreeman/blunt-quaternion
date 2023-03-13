@@ -1,10 +1,12 @@
 import * as ROT from 'rot-js';
 import { Item, LootList } from '.';
 import { Choice } from '../choices/ui';
+import { ThreeDLevelProps } from '../thirdDimension';
 import { FormCharacter } from './characters';
 
 interface DungeonLevel {
   name: string;
+  threeD?: Partial<ThreeDLevelProps>;
   characters?: FormCharacter[];
 }
 
@@ -29,7 +31,10 @@ const gnomeMineStandard: FormCharacter[] = [
 
 //nethackwiki.com/wiki/Mazes_of_Menace
 export const MazesOfMenace: DungeonLevel[] = [
-  { name: 'Surface Entrance' },
+  {
+    name: 'Surface Entrance',
+    threeD: { ceiling: false, innerRoom: 5, outerWall: 8, probBlock: 0.1 }
+  },
   {
     name: 'Gnomish Mines',
     characters: [...gnomeMineStandard]
@@ -53,6 +58,7 @@ export const MazesOfMenace: DungeonLevel[] = [
   },
   {
     name: 'Mine Town',
+    threeD: { innerRoom: 1, outerWall: 6, probBlock: 0.6 },
     characters: [
       ...gnomeMineStandard,
       {
@@ -103,10 +109,10 @@ export const MazesOfMenace: DungeonLevel[] = [
       }
     ]
   },
-
   {
     // https://nethackwiki.com/wiki/The_Oracle#Level
     name: 'Oracle',
+    threeD: { innerRoom: 2, outerWall: 3, probBlock: 0.6 },
     characters: [
       //https://nethackwiki.com/wiki/The_Oracle#Monster
       {
@@ -135,8 +141,9 @@ export const MazesOfMenace: DungeonLevel[] = [
     ]
   },
   {
-    name: "Mine's End",
     // https://nethackwiki.com/wiki/Mines%27_End
+    name: "Mine's End",
+    threeD: { innerRoom: 3, outerWall: 8, probBlock: 0.05 },
     characters: [
       {
         // https://nethackwiki.com/wiki/Snake
@@ -153,8 +160,9 @@ export const MazesOfMenace: DungeonLevel[] = [
     ]
   },
   {
-    name: 'Fort Ludios',
     // https://nethackwiki.com/wiki/Fort_Ludios
+    name: 'Fort Ludios',
+    threeD: { innerRoom: 4, outerWall: 6, probBlock: 0.5 },
     characters: [
       {
         // https://nethackwiki.com/wiki/Mastodon
@@ -211,6 +219,7 @@ const GivingAmuletOfYendor: Choice = {
 };
 MazesOfMenace.push({
   name: 'Sanctum',
+  threeD: { innerRoom: 3, outerWall: 5, probBlock: 0.8 },
   characters: [
     {
       name: 'High Cleric of Moloch',
