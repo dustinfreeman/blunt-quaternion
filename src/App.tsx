@@ -210,19 +210,22 @@ function App() {
     });
 
     //Simulate an adventure, taking the "real work" out of playing roguelikes
+    const delveSummaryMessage: string[] = [];
+
     const party = ROT.RNG.shuffle(game.party);
     //Loot Simulation
     const inventory = game.inventory;
     const someoneWearingRingOfSearching =
       party.filter((c) => c.ringFinger?.name === 'ring of searching').length >
       0;
-    inventory.push(
-      ...randomChoices(
-        World.LootList,
-        (2 + (someoneWearingRingOfSearching ? 2 : 0)) *
-          game.delveSimulation.lootMultiplier
-      )
-    );
+    const newLootCount =
+      2 +
+      (someoneWearingRingOfSearching ? 2 : 0) *
+        game.delveSimulation.lootMultiplier;
+    inventory.push(...randomChoices(World.LootList, newLootCount));
+    if (newLootCount) {
+      delveSummaryMessage.push('We found ' + newLootCount + ' pieces of loot.');
+    }
 
     //Combat Simulation
     const simulateCombat = () => {
@@ -274,9 +277,14 @@ function App() {
       });
     };
 
-    if (!game.delveSimulation.elberethed || ROT.RNG.getUniform() < 0.3) {
+    const protectedByElbereth =
+      game.delveSimulation.elberethed && ROT.RNG.getUniform() < 0.7;
+    if (!protectedByElbereth) {
       simulateCombat();
+    } else {
+      delveSummaryMessage.push('Thank Elbereth for protecting us.');
     }
+
     //Remove dead party members
     const freshCorpses = party.filter((p) => p.hp.current <= 0);
     filterInPlace(party, (p) => p.hp.current > 0);
@@ -329,9 +337,7 @@ function App() {
         //reset quaternion for next blaze
         quaternionIndex: ROT.RNG.getUniformInt(0, game.party.length - 1),
         bluntFraction: 1,
-        lastChoiceResult: game.delveSimulation.elberethed
-          ? 'Thank Elbereth for protecting us'
-          : '',
+        lastChoiceResult: delveSummaryMessage.join(' '),
         delveSimulation: Game.DelveSimulationDefaults()
       });
     }, 500);
