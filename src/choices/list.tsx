@@ -11,7 +11,9 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
     {
       buttonText: 'Think deep thoughts',
       made: () => {
-        const identities = [char.species, char.role, char.relationship];
+        const identities = [char.species, char.role, char.relationship].filter(
+          (ident) => ident
+        );
         const randIdentity = ROT.RNG.getItem(identities)!;
         return {
           bluntConsumed: 0.25,
