@@ -11,13 +11,15 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
     {
       buttonText: 'Think deep thoughts',
       made: () => {
+        const identities = [char.species, char.role, char.relationship];
+        const randIdentity = ROT.RNG.getItem(identities)!;
         return {
           bluntConsumed: 0.25,
           choiceResultMessage:
-            (char.attributes.WIS.val() < 17
-              ? 'I am a ' + char.species
+            (char.attributes.WIS.val() < 14
+              ? 'I am a ' + randIdentity
               : 'I am a simulated ' +
-                char.species +
+                randIdentity +
                 ' in a virtual environment.') +
             (char.attributes.WIS.exercise(0.3) ? ' (my wisdom increased!)' : '')
         };
