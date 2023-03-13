@@ -351,7 +351,7 @@ function App() {
         graveyard: [...game.graveyard, ...freshCorpses],
         inventory: inventory,
         //reset quaternion for next blaze
-        quaternionIndex: ROT.RNG.getUniformInt(0, game.party.length - 1),
+        quaternionIndex: 0,
         bluntFraction: 1,
         lastChoiceResult: delveSummaryMessage.join(' '),
         delveSimulation: Game.DelveSimulationDefaults()
