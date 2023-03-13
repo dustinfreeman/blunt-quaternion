@@ -21,8 +21,6 @@ const material = new THREE.MeshDepthMaterial({ wireframe: false });
 
 //Cube Grid
 const levelObjects: THREE.Object3D[] = [];
-const innerRoom = 1;
-const outerWall = 7;
 function makeCubeAt(x: number, y: number, z: number) {
   const cube = new THREE.Mesh(geometry, material);
   cube.position.set(x, y, z);
@@ -30,23 +28,45 @@ function makeCubeAt(x: number, y: number, z: number) {
   levelObjects.push(cube);
 }
 
-export function createRandomLevel() {
+export interface ThreeDLevelProps {
+  innerRoom: number;
+  outerWall: number;
+  probBlock: number;
+  ceiling: boolean;
+}
+
+export function createRandomLevel(props?: Partial<ThreeDLevelProps>) {
+  const fullProps: ThreeDLevelProps = {
+    ...{
+      innerRoom: 2,
+      outerWall: 7,
+      probBlock: 0.3,
+      ceiling: true
+    },
+    ...props
+  };
+
   levelObjects.forEach((cube) => scene.remove(cube));
   levelObjects.splice(0, levelObjects.length);
 
-  for (let i = -outerWall; i <= outerWall; i++) {
-    for (let j = -outerWall; j <= outerWall; j++) {
+  for (let i = -fullProps.outerWall; i <= fullProps.outerWall; i++) {
+    for (let j = -fullProps.outerWall; j <= fullProps.outerWall; j++) {
       //floor
       makeCubeAt(i, j, -1);
       //ceiling
-      makeCubeAt(i, j, 3);
-      if (Math.abs(i) <= innerRoom && Math.abs(j) <= innerRoom) {
+      if (fullProps.ceiling) {
+        makeCubeAt(i, j, 3);
+      }
+      if (
+        Math.abs(i) <= fullProps.innerRoom &&
+        Math.abs(j) <= fullProps.innerRoom
+      ) {
         continue;
       }
       if (
-        ROT.RNG.getUniform() < 0.3 ||
-        Math.abs(i) === outerWall ||
-        Math.abs(j) === outerWall
+        ROT.RNG.getUniform() < fullProps.probBlock ||
+        Math.abs(i) === fullProps.outerWall ||
+        Math.abs(j) === fullProps.outerWall
       ) {
         makeCubeAt(i, j, 0);
         makeCubeAt(i, j, 1);

@@ -10,6 +10,7 @@ import * as Comms from './comms';
 import * as Choices from './choices';
 import { filterInPlace, randomChoices } from './utils';
 import { scene, camera, createRandomLevel, animate } from './thirdDimension';
+import { MazesOfMenace } from './world';
 
 function App() {
   const canvasRef = React.createRef<HTMLCanvasElement>();
@@ -126,15 +127,15 @@ function App() {
   });
 
   const StartGame = useCallback(() => {
-    createRandomLevel();
-
     setBGColors({
       c1: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
       c2: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
       opacity: 0.3
     });
 
-    setGame(Game.Begin());
+    const newGame = Game.Begin();
+    createRandomLevel(MazesOfMenace[newGame.currentDungeonLevel]!.threeD);
+    setGame(newGame);
   }, [game, setGame]);
 
   const StartScreen: JSX.Element = (
@@ -209,21 +210,28 @@ function App() {
     });
 
     //Simulate an adventure, taking the "real work" out of playing roguelikes
-    const party = ROT.RNG.shuffle(game.party);
+    const delveSummaryMessage: string[] = [];
+
+    //leave behind any non-party members
+    const party = [...game.party];
+    filterInPlace(party, (p) => p.relationship === 'Party Member');
+
     //Loot Simulation
     const inventory = game.inventory;
     const someoneWearingRingOfSearching =
       party.filter((c) => c.ringFinger?.name === 'ring of searching').length >
       0;
-    inventory.push(
-      ...randomChoices(
-        World.LootList,
-        (2 + (someoneWearingRingOfSearching ? 2 : 0)) *
-          game.delveSimulation.lootMultiplier
-      )
-    );
+    const newLootCount =
+      2 *
+      (1 + (someoneWearingRingOfSearching ? 1 : 0)) *
+      game.delveSimulation.lootMultiplier;
+    inventory.push(...randomChoices(World.LootList, newLootCount));
+    if (newLootCount) {
+      delveSummaryMessage.push('We found ' + newLootCount + ' pieces of loot.');
+    }
 
     //Combat Simulation
+    let totalCombatIncidence = 0;
     const simulateCombat = () => {
       //TODO: assemble total combat power, instead of per-party member
       party.forEach((c: World.Character) => {
@@ -234,6 +242,7 @@ function App() {
           (wearingRingOfConflict ? 2 : 1) *
           (ROT.RNG.getUniform() + 1.5) *
           game.delveSimulation.combatMultiplier;
+        totalCombatIncidence += combatIncidence;
 
         //how much damage you took
         // wearing a ring of warning perhaps means you were able to
@@ -263,7 +272,9 @@ function App() {
           c.species,
           c.role,
           'combatIncidence',
-          combatIncidence
+          combatIncidence,
+          'totalCombatIncidence',
+          totalCombatIncidence
         );
 
         World.addXP(
@@ -271,16 +282,30 @@ function App() {
           Math.round(combatIncidence * 16 * strengthScaling * wisdomScaling)
         );
       });
+      if (totalCombatIncidence >= 1) {
+        delveSummaryMessage.push(
+          'We got into ' + Math.floor(totalCombatIncidence),
+          ' battles.'
+        );
+      }
     };
 
-    if (!game.delveSimulation.elberethed || ROT.RNG.getUniform() < 0.3) {
+    const protectedByElbereth =
+      game.delveSimulation.elberethed && ROT.RNG.getUniform() < 0.7;
+    if (!protectedByElbereth) {
       simulateCombat();
+    } else {
+      delveSummaryMessage.push('Thank Elbereth for protecting us.');
     }
+
     //Remove dead party members
     const freshCorpses = party.filter((p) => p.hp.current <= 0);
     filterInPlace(party, (p) => p.hp.current > 0);
-    //leave behind any non-party members
-    filterInPlace(party, (p) => p.relationship === 'Party Member');
+    freshCorpses.forEach((corpse) =>
+      delveSummaryMessage.push(
+        [corpse.species, corpse.role].join(' ') + ' died.'
+      )
+    );
 
     //Delving Direction
     let changeDelveDirectionMaybe: Partial<Game.GameState> = {};
@@ -296,7 +321,7 @@ function App() {
     );
 
     setTimeout(() => {
-      createRandomLevel();
+      createRandomLevel(MazesOfMenace[nextDungeonLevel]!.threeD);
       setBGColors({
         c1: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
         c2: ROT.Color.add([cValRand(), cValRand(), cValRand()]),
@@ -326,11 +351,9 @@ function App() {
         graveyard: [...game.graveyard, ...freshCorpses],
         inventory: inventory,
         //reset quaternion for next blaze
-        quaternionIndex: ROT.RNG.getUniformInt(0, game.party.length - 1),
+        quaternionIndex: 0,
         bluntFraction: 1,
-        lastChoiceResult: game.delveSimulation.elberethed
-          ? 'Thank Elbereth for protecting us'
-          : '',
+        lastChoiceResult: delveSummaryMessage.join(' '),
         delveSimulation: Game.DelveSimulationDefaults()
       });
     }, 500);
