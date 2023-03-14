@@ -32,6 +32,7 @@ export interface GameState {
   //current quaternion:
   quaternionIndex: number;
   bluntFraction: number;
+  choiceMade: boolean;
   lastChoiceResult: string;
   followUpChoices: Choices.Choice[];
 }
@@ -46,6 +47,7 @@ export const Empty = (): GameState => {
     delveSimulation: DelveSimulationDefaults(),
     quaternionIndex: 0,
     bluntFraction: 0,
+    choiceMade: false,
     lastChoiceResult: '',
     followUpChoices: []
   };
@@ -130,6 +132,7 @@ export const Begin = (): GameState => {
     delveSimulation: DelveSimulationDefaults(),
     quaternionIndex: 0,
     bluntFraction: 1,
+    choiceMade: false,
     lastChoiceResult: '',
     followUpChoices: []
   };

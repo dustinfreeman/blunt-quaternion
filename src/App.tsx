@@ -82,7 +82,6 @@ function App() {
         new THREE.Euler(Math.PI * 0.5, -yawRadians, 0)
       );
     }
-    //TODO: should use a deps list to ensure this re-renders properly
   }, [game]);
 
   //game updated
@@ -111,7 +110,8 @@ function App() {
           setGame({
             ...game,
             quaternionIndex:
-              Math.round(game.quaternionIndex) % game.party.length
+              Math.round(game.quaternionIndex) % game.party.length,
+            choiceMade: false
           });
         } else {
           //keep rotating
@@ -146,14 +146,21 @@ function App() {
   );
 
   function refreshChoices() {
-    const char = game.party[game.quaternionIndex];
-    if (!char || char.hp.current === 0) {
+    if (game.followUpChoices.length > 0) {
+      setChoiceList(ROT.RNG.shuffle(game.followUpChoices));
+      return;
+    }
+
+    if (game.choiceMade) {
+      //choice already made for this character, only pass will be available
       setChoiceList([]);
       return;
     }
 
-    if (game.followUpChoices.length > 0) {
-      setChoiceList(ROT.RNG.shuffle(game.followUpChoices));
+    const char = game.party[game.quaternionIndex];
+    //if char is undefined, we might be mid-rotation
+    if (!char || char.hp.current === 0) {
+      setChoiceList([]);
       return;
     }
 
@@ -179,8 +186,6 @@ function App() {
       lastChoiceResult: '',
       followUpChoices: []
     });
-
-    setChoiceList([]);
   };
 
   const makeChoice = useCallback(
@@ -190,9 +195,9 @@ function App() {
         followUpChoices: [],
         ...choiceResult.gameState,
         bluntFraction: game.bluntFraction - choiceResult.bluntConsumed,
-        lastChoiceResult: choiceResult.choiceResultMessage ?? ''
+        lastChoiceResult: choiceResult.choiceResultMessage ?? '',
+        choiceMade: true
       });
-      refreshChoices();
     },
     [game, setGame]
   );
@@ -353,6 +358,7 @@ function App() {
         //reset quaternion for next blaze
         quaternionIndex: 0,
         bluntFraction: 1,
+        choiceMade: false,
         lastChoiceResult: delveSummaryMessage.join(' '),
         delveSimulation: Game.DelveSimulationDefaults()
       });
