@@ -26,21 +26,21 @@ export const LootList: Item[] = [
     name: 'food ration',
     itemType: 'comestible',
     onConsume: (c) => {
-      c.hp.update(8);
+      return Characters.consumeForNutrition(c, 8);
     }
   },
   {
     name: 'tin of spinach',
     itemType: 'comestible',
     onConsume: (c) => {
-      c.hp.update(4);
+      return Characters.consumeForNutrition(c, 4);
     }
   },
   {
     name: 'egg',
     itemType: 'comestible',
     onConsume: (c) => {
-      c.hp.update(1);
+      return Characters.consumeForNutrition(c, 1);
     }
   },
   // https://nethackwiki.com/wiki/Potion#Table_of_potions
@@ -59,9 +59,9 @@ export const LootList: Item[] = [
     name: 'potion of booze',
     itemType: 'potion',
     onConsume: (c) => {
-      c.hp.update(2);
+      const msg = Characters.consumeForNutrition(c, 2);
       c.attributes.WIS.exercise(-0.2);
-      return 'I feel satiated, yet dumber';
+      return msg + ' I feel satiated, yet dumber';
     }
   },
   {

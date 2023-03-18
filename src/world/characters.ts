@@ -129,6 +129,15 @@ export const xpPerLevel = [
   100000000
 ];
 
+export function consumeForNutrition(char: Character, hpGain: number) {
+  let msg = '';
+  if (char.hp.isFull()) {
+    msg += 'I was already full.';
+  }
+  char.hp.update(hpGain);
+  return msg;
+}
+
 export function getXP(char: Character) {
   const lvl = Math.floor(char.level);
   let xp = xpPerLevel[lvl];
