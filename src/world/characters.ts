@@ -44,7 +44,7 @@ export interface Character {
   name?: string;
   species: Species;
   role: Role;
-  level: number;
+  level: number; //fractional.
   hp: Meter;
   attributes: AttrBlock;
   relationship: Relationship;

@@ -1,6 +1,6 @@
 import * as ROT from 'rot-js';
 import * as Choices from '../choices';
-import { Character, PlayerSpeciesList } from './characters';
+import * as Characters from './characters';
 
 // https://nethackwiki.com/wiki/Item
 type ItemType = 'comestible' | 'potion' | 'ring' | 'quest';
@@ -8,7 +8,7 @@ type ItemType = 'comestible' | 'potion' | 'ring' | 'quest';
 export interface Item {
   name: string;
   itemType: ItemType;
-  onConsume?: (c: Character) => string | void;
+  onConsume?: (c: Characters.Character) => string | void;
 }
 
 export const ConsumeVerb = (item: Item) => {
@@ -43,11 +43,14 @@ export const LootList: Item[] = [
       c.hp.update(1);
     }
   },
+  // https://nethackwiki.com/wiki/Potion#Table_of_potions
   {
     name: 'potion of polymorph',
     itemType: 'potion',
     onConsume: (c) => {
-      const newSpecies = ROT.RNG.getItem(PlayerSpeciesList) as string;
+      const newSpecies = ROT.RNG.getItem(
+        Characters.PlayerSpeciesList
+      ) as string;
       c.species = newSpecies;
       return 'I polymorphed myself into a ' + newSpecies;
     }
@@ -59,6 +62,20 @@ export const LootList: Item[] = [
       c.hp.update(2);
       c.attributes.WIS.exercise(-0.2);
       return 'I feel satiated, yet dumber';
+    }
+  },
+  {
+    name: 'potion of gain level',
+    itemType: 'potion',
+    onConsume: (c) => {
+      const lvl = ROT.Util.clamp(
+        Math.floor(c.level),
+        1,
+        Characters.xpPerLevel.length
+      );
+      const xpToAdd = Characters.xpPerLevel[lvl] + 1;
+      Characters.addXP(c, xpToAdd);
+      return 'I feel more experienced';
     }
   },
   // https://nethackwiki.com/wiki/Ring#Table_of_rings
@@ -76,7 +93,10 @@ export const LootList: Item[] = [
   }
 ];
 
-export function ConsumeChoice(char: Character, item: Item): Choices.Choice {
+export function ConsumeChoice(
+  char: Characters.Character,
+  item: Item
+): Choices.Choice {
   return {
     buttonText: "I'm going to " + ConsumeVerb(item) + ' this ' + item.name,
     made: (game) => {
@@ -92,7 +112,10 @@ export function ConsumeChoice(char: Character, item: Item): Choices.Choice {
   };
 }
 
-export function PutOnChoice(char: Character, item: Item): Choices.Choice {
+export function PutOnChoice(
+  char: Characters.Character,
+  item: Item
+): Choices.Choice {
   return {
     buttonText: "I'm going to put on this " + item.name,
     made: (game) => {
