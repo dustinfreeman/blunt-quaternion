@@ -30,7 +30,8 @@ export const DelveButton = styled.button({
 export const PassButton = styled.button({
   ...BaseButton,
   position: 'absolute',
-  textAlign: 'right',
+  textAlign: 'center',
+  textDecorationLine: 'none',
   top: '100%',
   width: '100%'
 });
