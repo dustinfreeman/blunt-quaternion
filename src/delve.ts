@@ -112,9 +112,10 @@ export function SimulateDelve(game: Game.GameState): Game.GameState {
   );
 
   //Delving Direction
-  let changeDelveDirectionMaybe: Partial<Game.GameState> = {};
-  if (game.currentDungeonLevel >= World.MazesOfMenace.length - 1) {
-    changeDelveDirectionMaybe = { delveDirection: -1 };
+  const amuletInInventory =
+    game.inventory.filter((i) => i.name === 'Amulet of Yendor').length > 0;
+  if (amuletInInventory) {
+    game.delveDirection = -1;
   }
   //TODO: bring back stochastic delving depth.
   // const delveDelta = Math.floor(0.9 + ROT.RNG.getUniform() * 1.2);
@@ -140,7 +141,6 @@ export function SimulateDelve(game: Game.GameState): Game.GameState {
   return {
     ...game,
     currentDungeonLevel: nextDungeonLevel,
-    ...changeDelveDirectionMaybe,
     party: party,
     graveyard: [...game.graveyard, ...freshCorpses],
     inventory: inventory,

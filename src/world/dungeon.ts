@@ -213,7 +213,7 @@ const GivingAmuletOfYendor: Choice = {
     return {
       bluntConsumed: 0.1,
       choiceResultMessage:
-        'Congratulations, you feel you should get out of here...'
+        'Congratulations, you feel you should ascend out of here...'
     };
   }
 };
