@@ -44,4 +44,7 @@ export class Meter {
   frac() {
     return this.current / this.max;
   }
+  isFull() {
+    return this.current === this.max;
+  }
 }

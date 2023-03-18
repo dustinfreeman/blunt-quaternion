@@ -19,18 +19,19 @@ export const _BaseButton = styled.button({
 
 export const DelveButton = styled.button({
   ...BaseButton,
-  bottom: '10px',
+  bottom: '5px',
   position: 'absolute',
   display: 'inline-block',
   width: 'max-content',
   margin: 'auto',
-  transform: 'translate(-50%, -50%)'
+  transform: 'translate(-50%, 0%)'
 });
 
 export const PassButton = styled.button({
   ...BaseButton,
   position: 'absolute',
-  textAlign: 'right',
+  textAlign: 'center',
+  textDecorationLine: 'none',
   top: '100%',
   width: '100%'
 });
