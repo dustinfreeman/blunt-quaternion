@@ -1,15 +1,5 @@
 import { RNG } from 'rot-js';
-import {
-  Character,
-  FleshOut,
-  FormCharacter,
-  Pets,
-  PlayerSpeciesList,
-  Role,
-  Roles,
-  Species,
-  Item
-} from './world';
+import * as World from './world';
 import * as Choices from './choices';
 import { Meter } from './utils';
 
@@ -23,9 +13,9 @@ export const DelveSimulationDefaults = (): DelveSimulation => {
 };
 
 export interface GameState {
-  party: Character[];
-  graveyard: Character[];
-  inventory: Item[];
+  party: World.Character[];
+  graveyard: World.Character[];
+  inventory: World.Item[];
   currentDungeonLevel: number;
   delveDirection: number;
   delveSimulation: DelveSimulation;
@@ -53,7 +43,7 @@ export const Empty = (): GameState => {
   };
 };
 
-const SurfaceTutorialGuide: FormCharacter = {
+const SurfaceTutorialGuide: World.FormCharacter = {
   name: 'Scholar of the M.o.M.',
   role: 'Archeologist',
   level: 10,
@@ -74,16 +64,16 @@ const SurfaceTutorialGuide: FormCharacter = {
 };
 
 export const Begin = (): GameState => {
-  const You: FormCharacter = {
+  const You: World.FormCharacter = {
     // https://nethackwiki.com/wiki/Player
     name: 'You',
-    role: RNG.getItem(Roles) as Role,
+    role: RNG.getItem(World.Roles) as World.Role,
     level: 1,
-    species: RNG.getItem(PlayerSpeciesList) as Species
+    species: RNG.getItem(World.PlayerSpeciesList) as World.Species
   };
   // https://nethackwiki.com/wiki/Hit_points#Hit_points_gained_on_level_gain_and_starting_hitpoints
   You.hp = new Meter(
-    new Map<Role, number>([
+    new Map<World.Role, number>([
       ['Archeologist', 11],
       ['Ranger', 13],
       ['Rogue', 10],
@@ -92,13 +82,13 @@ export const Begin = (): GameState => {
     ]).get(You.role)!
   );
 
-  const Pet: FormCharacter = {
+  const Pet: World.FormCharacter = {
     level: 1,
-    species: RNG.getItem(Pets) as Species
+    species: RNG.getItem(World.Pets) as World.Species
   };
-  const YourGod: FormCharacter = {
+  const YourGod: World.FormCharacter = {
     // https://nethackwiki.com/wiki/God
-    name: new Map<Role, string>([
+    name: new Map<World.Role, string>([
       ['Archeologist', 'Camaxtli'],
       ['Ranger', 'Venus'],
       ['Valkyrie', 'Odin'],
@@ -121,10 +111,15 @@ export const Begin = (): GameState => {
     ]
   };
 
-  const party: FormCharacter[] = [SurfaceTutorialGuide, You, Pet, YourGod];
+  const party: World.FormCharacter[] = [
+    SurfaceTutorialGuide,
+    You,
+    Pet,
+    YourGod
+  ];
 
   return {
-    party: FleshOut(party),
+    party: World.FleshOut(party),
     graveyard: [],
     inventory: [],
     currentDungeonLevel: 0,
