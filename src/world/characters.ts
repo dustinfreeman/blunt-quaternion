@@ -151,26 +151,26 @@ export function addXP(char: Character, xp: number) {
     //level up!
 
     // https://nethackwiki.com/wiki/Hit_points#Hit_points_gained_on_level_gain_and_starting_hitpoints
-    let newHPMax = char.hp.max;
+    let hpMaxGain = 0;
     if (char.role) {
       if (char.role === 'Ranger') {
-        newHPMax += ROT.RNG.getUniformInt(1, 6);
+        hpMaxGain += ROT.RNG.getUniformInt(1, 6);
       } else {
-        newHPMax += ROT.RNG.getUniformInt(1, 8);
+        hpMaxGain += ROT.RNG.getUniformInt(1, 8);
       }
     }
     if (['elf', 'gnome', 'orc'].includes(char.species)) {
-      newHPMax += 1;
+      hpMaxGain += 1;
     } else if (char.species === 'human') {
-      newHPMax += ROT.RNG.getUniformInt(1, 2);
+      hpMaxGain += ROT.RNG.getUniformInt(1, 2);
     } else if (char.species === 'dwarf') {
-      newHPMax += ROT.RNG.getUniformInt(1, 3);
+      hpMaxGain += ROT.RNG.getUniformInt(1, 3);
     } else {
       // https://nethackwiki.com/wiki/Hit_points#Normal_case
-      newHPMax += ROT.RNG.getUniformInt(1, 8);
+      hpMaxGain += ROT.RNG.getUniformInt(1, 8);
     }
 
-    char.hp = new Meter(newHPMax); //also get full health.
+    char.hp = new Meter(char.hp.max + hpMaxGain, char.hp.current + hpMaxGain);
   }
 
   char.level = nextLevel;
