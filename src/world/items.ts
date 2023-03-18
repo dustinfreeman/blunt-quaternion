@@ -90,6 +90,10 @@ export const LootList: Item[] = [
   {
     name: 'ring of searching',
     itemType: 'ring'
+  },
+  {
+    name: 'ring of regeneration',
+    itemType: 'ring'
   }
 ];
 

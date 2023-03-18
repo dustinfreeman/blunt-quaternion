@@ -303,6 +303,19 @@ function App() {
       delveSummaryMessage.push('Thank Elbereth for protecting us.');
     }
 
+    // https://nethackwiki.com/wiki/Regeneration
+    // ideally, approximate how "long" the delve was
+    const regenBase =
+      1 +
+      game.currentDungeonLevel +
+      newLootCount * 0.25 +
+      totalCombatIncidence * 0.1;
+    party.forEach((c) => {
+      const wearingRingOfRegen = c.ringFinger?.name === 'ring of regeneration';
+      const regen = regenBase * (wearingRingOfRegen ? 2 : 1);
+      c.hp.update(Math.floor(regen));
+    });
+
     //Remove dead party members
     const freshCorpses = party.filter((p) => p.hp.current <= 0);
     filterInPlace(party, (p) => p.hp.current > 0);
