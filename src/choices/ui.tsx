@@ -21,7 +21,7 @@ export interface Choice {
 const ChoiceList = styled.div({
   position: 'absolute',
   // backgroundColor: '#fa48',
-  bottom: 10,
+  bottom: 30,
   left: ResponsiveApp.width / 2 + 20,
   right: 55
 });

@@ -242,8 +242,8 @@ function App() {
         Dungeon Level: {game.currentDungeonLevel} <br />
         {World.MazesOfMenace.at(game.currentDungeonLevel)?.name}
       </UI.DungeonLevelTitle>
-      {game.bluntFraction > 0 && (
-        <span>
+      <span>
+        {game.bluntFraction > 0 && (
           <UI.Blunt bluntFraction={game.bluntFraction}>
             <UI.PassButton
               onClick={() => {
@@ -254,14 +254,14 @@ function App() {
               Blunt
             </UI.PassButton>
           </UI.Blunt>
-          <Choices.ShowChoices
-            choices={choiceList}
-            game={game}
-            onChoice={makeChoice}
-          />
-        </span>
-      )}
-      {game.bluntFraction <= 0 && (
+        )}
+        <Choices.ShowChoices
+          choices={choiceList}
+          game={game}
+          onChoice={makeChoice}
+        />
+      </span>
+      {game.bluntFraction <= 0 && game.quaternionIndex % 1 === 0 && (
         <UI.DelveButton
           onClick={() => {
             delveNext();
