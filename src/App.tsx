@@ -340,6 +340,44 @@ function App() {
     </ResponsiveApp.Overlay>
   );
 
+  //Shortcut Key Handling
+  const handleKeyDown = useCallback(
+    (e: any) => {
+      console.log('key down handled! ', e);
+      if (game.currentDungeonLevel < 0) {
+        if (e.key === ' ') {
+          StartGame();
+        }
+      } else {
+        //playing the game
+        if (e.key === ' ') {
+          if (readyToDelve()) {
+            delveNext();
+          } else {
+            passBlunt();
+          }
+        }
+        const ChoiceShortcutMap = new Map<string, number>([
+          ['a', 0],
+          ['s', 1],
+          ['d', 2]
+        ]);
+        const choiceIndex = ChoiceShortcutMap.get(e.key);
+        if (choiceIndex !== undefined && choiceIndex < choiceList.length) {
+          //TODO: highlight the choice button chosen, please
+          makeChoice(choiceList[choiceIndex].made(game));
+        }
+      }
+    },
+    [game, StartGame, delveNext, passBlunt, choiceList, makeChoice]
+  );
+  useEffect(() => {
+    document.body.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.removeEventListener('keydown', handleKeyDown);
+    };
+  });
+
   const [showHelp, setShowHelp] = useState(false);
 
   return (
