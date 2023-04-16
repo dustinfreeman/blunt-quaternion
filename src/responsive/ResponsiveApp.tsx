@@ -8,7 +8,6 @@ export const height = 225;
 export const Root = styled.div({
   display: 'block',
   textAlign: 'center',
-  verticalAlign: 'middle',
   backgroundColor: '#335cae',
   width: width + 'px',
   height: height + 'px',
