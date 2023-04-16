@@ -26,6 +26,8 @@ export function RootDivWithThree(props: {
     );
     appContainer.style.transform = 'scale(' + scale + ') translate(-50%, -50%)';
   };
+
+  //"run every time"
   useEffect(() => {
     handleWindowSizeChange();
     window.addEventListener('resize', handleWindowSizeChange);

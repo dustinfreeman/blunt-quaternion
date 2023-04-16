@@ -145,10 +145,6 @@ function App() {
       <UI.DelveButton onClick={StartGame}>Begin...</UI.DelveButton>
     </ResponsiveApp.Overlay>
   );
-  //HACK: uncomment to autostart game during development
-  // useEffect(() => {
-  //   StartGame();
-  // }, []);
 
   function refreshChoices() {
     if (game.followUpChoices.length > 0) {
@@ -236,9 +232,19 @@ function App() {
     }, 500);
   }, [game, setGame]);
 
+  const readyToDelve = useCallback(() => {
+    return game.bluntFraction <= 0 && game.quaternionIndex % 1 === 0;
+  }, [game]);
+
   const restartGame = useCallback(() => {
     setGame(Game.Empty());
   }, [setGame]);
+
+  //"run once"
+  useEffect(() => {
+    //HACK: uncomment to autostart game during development
+    // StartGame();
+  }, []);
 
   const BQScreen: JSX.Element = (
     <ResponsiveApp.Overlay>
@@ -265,7 +271,7 @@ function App() {
           onChoice={makeChoice}
         />
       </span>
-      {game.bluntFraction <= 0 && game.quaternionIndex % 1 === 0 && (
+      {readyToDelve() && (
         <UI.DelveButton
           onClick={() => {
             delveNext();
