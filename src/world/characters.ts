@@ -114,7 +114,7 @@ export function FleshOut(chars: FormCharacter[]): Character[] {
       // https://nethackwiki.com/wiki/Hit_points#Hit_points_gained_on_level_gain_and_starting_hitpoints
       hp: new Meter(c.level * 4),
       ringFinger: undefined,
-      tactics: { aggression: 0.2, looting: 0.2 },
+      tactics: { aggression: 0.5 },
       extraChoices: charChoices,
       //then the form object...
       ...c
