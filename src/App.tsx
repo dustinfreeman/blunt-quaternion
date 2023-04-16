@@ -145,6 +145,10 @@ function App() {
       <UI.DelveButton onClick={StartGame}>Begin...</UI.DelveButton>
     </ResponsiveApp.Overlay>
   );
+  //HACK: uncomment to autostart game during development
+  // useEffect(() => {
+  //   StartGame();
+  // }, []);
 
   function refreshChoices() {
     if (game.followUpChoices.length > 0) {
