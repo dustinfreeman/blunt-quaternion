@@ -18,6 +18,8 @@ export function SimulateDelve(game: Game.GameState): Game.GameState {
   const newLootCount =
     2 *
     (1 + (someoneWearingRingOfSearching ? 1 : 0)) *
+    //when ascending, assume loot is already stripped from the dungeon
+    (game.delveDirection > 0 ? 1 : 0.25) *
     game.delveSimulation.lootMultiplier;
   inventory.push(...randomChoices(World.LootList, newLootCount));
   if (newLootCount) {
