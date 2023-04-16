@@ -39,10 +39,12 @@ export const Overlay = styled.div({
   textAlign: 'center'
 });
 
-export function RootDiv(props: {
+export interface ResponsiveProps {
   children: React.ReactNode;
   canvasRef: React.RefObject<HTMLCanvasElement>;
-}) {
+}
+
+export function RootDiv(props: ResponsiveProps) {
   const appContainerRef = React.createRef<HTMLDivElement>();
 
   //window resizing
