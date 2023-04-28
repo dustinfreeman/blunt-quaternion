@@ -18,6 +18,8 @@ export function SimulateDelve(game: Game.GameState): Game.GameState {
   const newLootCount =
     2 *
     (1 + (someoneWearingRingOfSearching ? 1 : 0)) *
+    //when ascending, assume loot is already stripped from the dungeon
+    (game.delveDirection > 0 ? 1 : 0.25) *
     game.delveSimulation.lootMultiplier;
   inventory.push(...randomChoices(World.LootList, newLootCount));
   if (newLootCount) {
@@ -105,8 +107,7 @@ export function SimulateDelve(game: Game.GameState): Game.GameState {
   });
 
   //Remove dead party members
-  const freshCorpses = party.filter((p) => p.hp.current <= 0);
-  filterInPlace(party, (p) => p.hp.current > 0);
+  const freshCorpses = filterInPlace(party, (p) => p.hp.current > 0);
   freshCorpses.forEach((corpse) =>
     delveSummaryMessage.push([corpse.species, corpse.role].join(' ') + ' died.')
   );
@@ -130,10 +131,9 @@ export function SimulateDelve(game: Game.GameState): Game.GameState {
   const locals = [
     ...World.FleshOut(World.MazesOfMenace[nextDungeonLevel].characters ?? [])
   ];
-  //definitely add guides
-  //TODO: generalize "move from one array to another with a filter"
-  party.push(...locals.filter((p) => p.relationship === 'Guide'));
-  filterInPlace(locals, (p) => p.relationship !== 'Guide');
+  //guarantee adding guides
+  filterInPlace(locals, (p) => p.relationship !== 'Guide', party);
+  //randomly add remaining locals
   if (party.length < 4) {
     party.push(...randomChoices(locals, 4 - party.length));
   }

@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
 import * as THREE from 'three';
-import { FillCanvas, height, Overlay, Root, width } from '.';
+import { FillCanvas, height, Overlay, ResponsiveProps, Root, width } from '.';
 
 let threeCanvas: HTMLCanvasElement | undefined = undefined;
 
-export function RootDivWithThree(props: {
-  children: React.ReactNode;
-  canvasRef: React.RefObject<HTMLCanvasElement>;
-  scene: THREE.Scene;
-  camera: THREE.Camera;
-  animate: () => void;
-}) {
+export function RootDivWithThree(
+  props: ResponsiveProps & {
+    scene: THREE.Scene;
+    camera: THREE.Camera;
+    animate: () => void;
+  }
+) {
   const appContainerRef = React.createRef<HTMLDivElement>();
   const threeCanvasMountPoint = React.createRef<HTMLDivElement>();
 
@@ -26,6 +26,8 @@ export function RootDivWithThree(props: {
     );
     appContainer.style.transform = 'scale(' + scale + ') translate(-50%, -50%)';
   };
+
+  //"run every time"
   useEffect(() => {
     handleWindowSizeChange();
     window.addEventListener('resize', handleWindowSizeChange);

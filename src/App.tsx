@@ -232,9 +232,19 @@ function App() {
     }, 500);
   }, [game, setGame]);
 
+  const readyToDelve = useCallback(() => {
+    return game.bluntFraction <= 0 && game.quaternionIndex % 1 === 0;
+  }, [game]);
+
   const restartGame = useCallback(() => {
     setGame(Game.Empty());
   }, [setGame]);
+
+  //"run once"
+  useEffect(() => {
+    //HACK: uncomment to autostart game during development
+    // StartGame();
+  }, []);
 
   const BQScreen: JSX.Element = (
     <ResponsiveApp.Overlay>
@@ -261,7 +271,7 @@ function App() {
           onChoice={makeChoice}
         />
       </span>
-      {game.bluntFraction <= 0 && game.quaternionIndex % 1 === 0 && (
+      {readyToDelve() && (
         <UI.DelveButton
           onClick={() => {
             delveNext();
@@ -329,6 +339,44 @@ function App() {
       {partyIsDead() && LossScreen}
     </ResponsiveApp.Overlay>
   );
+
+  //Shortcut Key Handling
+  const handleKeyDown = useCallback(
+    (e: any) => {
+      console.log('key down handled! ', e);
+      if (game.currentDungeonLevel < 0) {
+        if (e.key === ' ') {
+          StartGame();
+        }
+      } else {
+        //playing the game
+        if (e.key === ' ') {
+          if (readyToDelve()) {
+            delveNext();
+          } else {
+            passBlunt();
+          }
+        }
+        const ChoiceShortcutMap = new Map<string, number>([
+          ['a', 0],
+          ['s', 1],
+          ['d', 2]
+        ]);
+        const choiceIndex = ChoiceShortcutMap.get(e.key);
+        if (choiceIndex !== undefined && choiceIndex < choiceList.length) {
+          //TODO: highlight the choice button chosen, please
+          makeChoice(choiceList[choiceIndex].made(game));
+        }
+      }
+    },
+    [game, StartGame, delveNext, passBlunt, choiceList, makeChoice]
+  );
+  useEffect(() => {
+    document.body.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.removeEventListener('keydown', handleKeyDown);
+    };
+  });
 
   const [showHelp, setShowHelp] = useState(false);
 
