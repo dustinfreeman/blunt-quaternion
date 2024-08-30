@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import * as ROT from 'rot-js';
 import * as THREE from 'three';
 //Local:
+import packageJson from '../package.json';
 import * as UI from './ui';
 import * as ResponsiveApp from './responsive';
 import * as Game from './game';
@@ -398,6 +399,7 @@ function App() {
             }}>
             Restart Game
           </UI._BaseButton>
+          <div>version: {packageJson.version}</div>
         </ResponsiveApp.Overlay>
       )}
       <UI.HelpButton
