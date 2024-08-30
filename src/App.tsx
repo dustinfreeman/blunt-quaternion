@@ -342,6 +342,9 @@ function App() {
   );
 
   //Shortcut Key Handling
+  const ChoiceList = ['a', 's', 'd'];
+  const keyInstructions =
+    'Space to pass blunt, ' + ChoiceList.join(',') + ' to make choice.';
   const handleKeyDown = useCallback(
     (e: any) => {
       console.log('key down handled! ', e);
@@ -358,13 +361,8 @@ function App() {
             passBlunt();
           }
         }
-        const ChoiceShortcutMap = new Map<string, number>([
-          ['a', 0],
-          ['s', 1],
-          ['d', 2]
-        ]);
-        const choiceIndex = ChoiceShortcutMap.get(e.key);
-        if (choiceIndex !== undefined && choiceIndex < choiceList.length) {
+        const choiceIndex = ChoiceList.indexOf(e.key);
+        if (choiceIndex > 0 && choiceIndex < choiceList.length) {
           //TODO: highlight the choice button chosen, please
           makeChoice(choiceList[choiceIndex].made(game));
         }
@@ -399,6 +397,7 @@ function App() {
             }}>
             Restart Game
           </UI._BaseButton>
+          <div>Tip: {keyInstructions}</div>
           <div>version: {packageJson.version}</div>
         </ResponsiveApp.Overlay>
       )}
