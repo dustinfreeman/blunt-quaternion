@@ -366,7 +366,7 @@ function App() {
           }
         }
         const choiceIndex = ChoiceList.indexOf(e.key);
-        if (choiceIndex > 0 && choiceIndex < choiceList.length) {
+        if (choiceIndex >= 0 && choiceIndex < choiceList.length) {
           //TODO: highlight the choice button chosen, please
           makeChoice(choiceList[choiceIndex].made(game));
         }
