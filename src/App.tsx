@@ -86,10 +86,10 @@ function App() {
     }
   }, [game]);
 
-  //game updated
+  //party dead check
   useEffect(() => {
     if (game.quaternionIndex % 1 === 0) {
-      console.log('game state: ', game);
+      //HACK for debugging: console.log('game state: ', game);
     }
     if (!partyIsDead()) {
       //playing
@@ -241,8 +241,11 @@ function App() {
     setGame(Game.Empty());
   }, [setGame]);
 
-  //"run once"
+  //run once after app open
   useEffect(() => {
+    //TODO: the following does not work. It does when called from componentDidUpdate, so what is wrong here?
+    canvasRef.current?.focus();
+
     //HACK: uncomment to autostart game during development
     // StartGame();
   }, []);
@@ -355,6 +358,7 @@ function App() {
       } else {
         //playing the game
         if (e.key === ' ') {
+          //the "default action"
           if (readyToDelve()) {
             delveNext();
           } else {
