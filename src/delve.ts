@@ -62,15 +62,13 @@ export function SimulateDelve(game: Game.GameState): Game.GameState {
       }
 
       console.log(
-        'Simulations',
+        'Simulated Combat:',
         game.delveSimulation,
+        'combat by',
         c.name,
         c.species,
         c.role,
-        'combatIncidence',
-        combatIncidence,
-        'totalCombatIncidence',
-        totalCombatIncidence
+        { combatIncidence, totalCombatIncidence }
       );
 
       World.addXP(
