@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import * as ROT from 'rot-js';
 import * as THREE from 'three';
 //Local:
+import packageJson from '../package.json';
 import * as UI from './ui';
 import * as ResponsiveApp from './responsive';
 import * as Game from './game';
@@ -85,10 +86,10 @@ function App() {
     }
   }, [game]);
 
-  //game updated
+  //party dead check
   useEffect(() => {
     if (game.quaternionIndex % 1 === 0) {
-      console.log('game state: ', game);
+      //HACK for debugging: console.log('game state: ', game);
     }
     if (!partyIsDead()) {
       //playing
@@ -232,9 +233,22 @@ function App() {
     }, 500);
   }, [game, setGame]);
 
+  const readyToDelve = useCallback(() => {
+    return game.bluntFraction <= 0 && game.quaternionIndex % 1 === 0;
+  }, [game]);
+
   const restartGame = useCallback(() => {
     setGame(Game.Empty());
   }, [setGame]);
+
+  //run once after app open
+  useEffect(() => {
+    //TODO: the following does not work. It does when called from componentDidUpdate, so what is wrong here?
+    canvasRef.current?.focus();
+
+    //HACK: uncomment to autostart game during development
+    // StartGame();
+  }, []);
 
   const BQScreen: JSX.Element = (
     <ResponsiveApp.Overlay>
@@ -261,7 +275,7 @@ function App() {
           onChoice={makeChoice}
         />
       </span>
-      {game.bluntFraction <= 0 && game.quaternionIndex % 1 === 0 && (
+      {readyToDelve() && (
         <UI.DelveButton
           onClick={() => {
             delveNext();
@@ -330,6 +344,43 @@ function App() {
     </ResponsiveApp.Overlay>
   );
 
+  //Shortcut Key Handling
+  const ChoiceList = ['a', 's', 'd'];
+  const keyInstructions =
+    'Space to pass blunt, ' + ChoiceList.join(',') + ' to make choice.';
+  const handleKeyDown = useCallback(
+    (e: any) => {
+      console.log('key down handled! ', e);
+      if (game.currentDungeonLevel < 0) {
+        if (e.key === ' ') {
+          StartGame();
+        }
+      } else {
+        //playing the game
+        if (e.key === ' ') {
+          //the "default action"
+          if (readyToDelve()) {
+            delveNext();
+          } else {
+            passBlunt();
+          }
+        }
+        const choiceIndex = ChoiceList.indexOf(e.key);
+        if (choiceIndex >= 0 && choiceIndex < choiceList.length) {
+          //TODO: highlight the choice button chosen, please
+          makeChoice(choiceList[choiceIndex].made(game));
+        }
+      }
+    },
+    [game, StartGame, delveNext, passBlunt, choiceList, makeChoice]
+  );
+  useEffect(() => {
+    document.body.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.removeEventListener('keydown', handleKeyDown);
+    };
+  });
+
   const [showHelp, setShowHelp] = useState(false);
 
   return (
@@ -350,6 +401,8 @@ function App() {
             }}>
             Restart Game
           </UI._BaseButton>
+          <div>Tip: {keyInstructions}</div>
+          <div>version: {packageJson.version}</div>
         </ResponsiveApp.Overlay>
       )}
       <UI.HelpButton

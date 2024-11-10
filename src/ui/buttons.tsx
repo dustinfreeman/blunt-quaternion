@@ -8,7 +8,6 @@ export const BaseButton: CSSObject = {
   color: 'darkred',
   fontFamily: 'monospace',
   borderRadius: '1px',
-  display: 'block',
   pointerEvents: 'all',
   padding: 0
 };
@@ -29,6 +28,7 @@ export const DelveButton = styled.button({
 
 export const PassButton = styled.button({
   ...BaseButton,
+  display: 'block',
   position: 'absolute',
   textAlign: 'center',
   textDecorationLine: 'none',

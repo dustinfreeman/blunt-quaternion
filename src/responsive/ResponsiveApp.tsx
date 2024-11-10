@@ -8,7 +8,6 @@ export const height = 225;
 export const Root = styled.div({
   display: 'block',
   textAlign: 'center',
-  verticalAlign: 'middle',
   backgroundColor: '#335cae',
   width: width + 'px',
   height: height + 'px',
@@ -40,10 +39,12 @@ export const Overlay = styled.div({
   textAlign: 'center'
 });
 
-export function RootDiv(props: {
+export interface ResponsiveProps {
   children: React.ReactNode;
   canvasRef: React.RefObject<HTMLCanvasElement>;
-}) {
+}
+
+export function RootDiv(props: ResponsiveProps) {
   const appContainerRef = React.createRef<HTMLDivElement>();
 
   //window resizing
@@ -58,6 +59,8 @@ export function RootDiv(props: {
     );
     appContainer.style.transform = 'scale(' + scale + ') translate(-50%, -50%)';
   };
+
+  //"run every time"
   useEffect(() => {
     handleWindowSizeChange();
     window.addEventListener('resize', handleWindowSizeChange);
@@ -65,6 +68,7 @@ export function RootDiv(props: {
       window.removeEventListener('resize', handleWindowSizeChange);
     };
   });
+
   return (
     <Root ref={appContainerRef}>
       <FillCanvas ref={props.canvasRef} width={width} height={height} />

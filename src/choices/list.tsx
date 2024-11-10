@@ -11,19 +11,45 @@ export function ChoicesFor(char: World.Character, game: GameState): Choice[] {
     {
       buttonText: 'Think deep thoughts',
       made: () => {
-        const identities = [char.species, char.role, char.relationship].filter(
-          (ident) => ident
-        );
-        const randIdentity = ROT.RNG.getItem(identities)!;
+        const wisdomIncreases = char.attributes.WIS.exercise(0.3);
+
+        const identity = () => {
+          const identities = [
+            char.species,
+            char.role,
+            char.relationship
+          ].filter((ident) => ident);
+          const randIdentity = ROT.RNG.getItem(identities)!;
+          return char.attributes.WIS.val() < 14
+            ? 'I am a ' + randIdentity
+            : 'I am a simulated ' + randIdentity + ' in a virtual environment.';
+        };
+
+        const deepThoughts: string[] = [identity()];
+
+        if (char.relationship === 'Party Member') {
+          const wearing = () => {
+            if (char.ringFinger) {
+              return 'I am wearing a ' + char.ringFinger.name;
+            }
+            return 'I would look snazzier if I was wearing a ring.';
+          };
+          deepThoughts.push(wearing());
+
+          if (char.tactics.aggression >= 0.75) {
+            deepThoughts.push('I am very aggressive.');
+          }
+          if (char.tactics.aggression <= 0.25) {
+            deepThoughts.push('I am nearly a pacifist.');
+          }
+        }
+
+        const msg = ROT.RNG.getItem(deepThoughts)!;
+
         return {
           bluntConsumed: 0.25,
           choiceResultMessage:
-            (char.attributes.WIS.val() < 14
-              ? 'I am a ' + randIdentity
-              : 'I am a simulated ' +
-                randIdentity +
-                ' in a virtual environment.') +
-            (char.attributes.WIS.exercise(0.3) ? ' (my wisdom increased!)' : '')
+            msg + (wisdomIncreases ? ' (my wisdom increased!)' : '')
         };
       }
     }

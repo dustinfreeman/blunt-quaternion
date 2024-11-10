@@ -1,17 +1,34 @@
 import * as ROT from 'rot-js';
 
-export function filterInPlace<T>(a: T[], condition: (val: T) => boolean) {
+export function filterInPlace<T>(
+  src: T[],
+  condition: (val: T) => boolean,
+  dst?: T[]
+) {
+  //removes elements not matching condition from src array,
+  // and returns them as dst array
+
+  //optionally, can use a passed pre-existing dst array
+  if (!dst) {
+    dst = [];
+  }
+
   let i = 0,
     j = 0;
 
-  while (i < a.length) {
-    const val = a[i];
-    if (condition(val)) a[j++] = val;
+  while (i < src.length) {
+    const val = src[i];
+    if (condition(val)) {
+      src[j++] = val;
+    } else {
+      dst.push(val);
+    }
     i++;
   }
 
-  a.length = j;
-  return a;
+  src.length = j;
+
+  return dst;
 }
 
 export function randomChoices<T>(arr: readonly T[], quantity: number): T[] {
